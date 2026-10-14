@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { Botao, Chip, Titulo, cores, raios, tipo } from '@garagem/ds'
+import { StyleSheet, Text, View } from 'react-native'
+import { Botao, Campo, Chip, Titulo, tipo } from '@garagem/ds'
 import type { Filtros } from '../types'
 import { FILTROS_VAZIOS, lerNumero } from '../utils/filtros'
 import { ORDENS, ROTULOS_ORDEM } from '../utils/ordenar'
@@ -65,13 +65,12 @@ type CampoNumeroProps = { rotulo: string; valor?: number; onChange: (valor: numb
 function CampoNumero({ rotulo, valor, onChange }: CampoNumeroProps) {
   return (
     <Secao titulo={rotulo}>
-      <TextInput
+      <Campo
         value={valor === undefined ? '' : String(valor)}
         onChangeText={(texto) => onChange(lerNumero(texto))}
         inputMode="numeric"
         maxLength={9}
         aria-label={rotulo}
-        style={[tipo.corpo, estilos.input]}
       />
     </Secao>
   )
@@ -81,12 +80,4 @@ const estilos = StyleSheet.create({
   painel: { gap: 20 },
   secao: { gap: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  input: {
-    minHeight: 48,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: cores.inkSoft,
-    borderRadius: raios.botao,
-    backgroundColor: cores.bg,
-  },
 })

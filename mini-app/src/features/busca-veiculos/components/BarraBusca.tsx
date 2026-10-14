@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
-import { Icone, cores, raios, tipo } from '@garagem/ds'
+import { Icone, cores, raios, sombras, tipo } from '@garagem/ds'
 
 type Props = { valor: string; onChange: (texto: string) => void }
 
@@ -28,6 +28,7 @@ export function BarraBusca({ valor, onChange }: Props) {
 }
 
 const estilos = StyleSheet.create({
+  // pílula branca com sombra sobre o fundo surface (sem contorno)
   barra: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -35,9 +36,8 @@ const estilos = StyleSheet.create({
     minHeight: 48,
     paddingLeft: 16,
     borderRadius: raios.pilula,
-    borderWidth: 1,
-    borderColor: cores.inkSoft,
     backgroundColor: cores.bg,
+    boxShadow: sombras.card,
   },
   input: { flex: 1, paddingVertical: 10 },
   limpar: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
