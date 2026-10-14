@@ -1538,11 +1538,11 @@ module.exports = {
 }
 ```
 
-- [ ] **Step 2: `react-native.config.js`** (troca os comandos do Metro pelos do Re.Pack)
+- [ ] **Step 2: `react-native.config.js`** (troca os comandos do Metro pelos do Re.Pack; `/commands` escolhe o Rspack pelo nome do config — `/commands/rspack` está depreciado)
 
 ```js
 module.exports = {
-  commands: require('@callstack/repack/commands/rspack'),
+  commands: require('@callstack/repack/commands'),
 }
 ```
 
@@ -1611,11 +1611,16 @@ export default Repack.defineRspackConfig((env) => {
 
 - [ ] **Step 5: Subir em background e conferir o manifesto**
 
-Run (background): `cd mini-app && npm run dev:native > /tmp/estudo-mf-mini-native.log 2>&1`
-Esperar e conferir: `node -e "fetch('http://localhost:9000/ios/mf-manifest.json').then(r=>r.text()).then(console.log)"`
-Expected: manifesto com `"name":"busca"` e o expose `BuscaVeiculos`. Se o comando `start` conflitar com o do RN (erro no log), trocar o script para `react-native webpack-start --config rspack.native.config.mjs --port 9000` e registrar o porquê no commit.
+```bash
+cd mini-app && nohup npm run dev:native > /tmp/estudo-mf-mini-native.log 2>&1 &
+until node -e "fetch('http://localhost:9000/ios/mf-manifest.json').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; do sleep 3; done
+node -e "fetch('http://localhost:9000/ios/mf-manifest.json').then(r=>r.json()).then(m=>console.log(m.name, m.exposes.map(e=>e.name)))"
+```
+Expected: `busca [ 'BuscaVeiculos' ]` (o primeiro build pode levar um minuto). No CLI 20, os comandos do `react-native.config.js` têm prioridade sobre os do Metro, então `react-native start` roda o Re.Pack.
 
 - [ ] **Step 6: Parar o servidor e commitar**
+
+Run: `lsof -ti tcp:9000 | xargs kill`
 
 ```bash
 git add mini-app/babel.config.js mini-app/react-native.config.js mini-app/index.native.js mini-app/rspack.native.config.mjs mini-app/package.json
@@ -1627,8 +1632,8 @@ git commit -m "feat(mini-app): build nativo via Re.Pack"
 **Files:**
 - Create (gerado): `host-rn/` (template RN 0.86.3)
 - Create: `host-rn/.ruby-version`, `host-rn/react-native.config.js`, `host-rn/rspack.config.mjs`
-- Delete: `host-rn/metro.config.js`, `host-rn/App.tsx`, `host-rn/__tests__/`
-- Modify: `host-rn/index.js`, `host-rn/tsconfig.json`, `host-rn/package.json`
+- Delete: `host-rn/metro.config.js`
+- Modify: `host-rn/tsconfig.json`, `host-rn/package.json`
 
 - [ ] **Step 1: Gerar o projeto**
 
@@ -1640,11 +1645,11 @@ Expected: pasta `host-rn/` com `ios/`, `android/`, `package.json` (react 19.2.3,
 ```bash
 cd host-rn
 npm install
-npm install @react-navigation/native@^7 @react-navigation/native-stack@^7 react-native-screens@4.26.2 react-native-safe-area-context@5.8.0
-npm install -D @callstack/repack@5.4.2 @rspack/core@1.6.0 @swc/helpers@~0.5.17 @module-federation/enhanced@2.9.2
+npm install -E @react-navigation/native@7.3.14 @react-navigation/native-stack@7.18.6 react-native-screens@4.26.2 react-native-safe-area-context@5.8.0
+npm install -D -E @callstack/repack@5.4.2 @rspack/core@1.6.0 @swc/helpers@0.5.17 @module-federation/enhanced@2.9.2
 npm ls react react-native --depth=0
 ```
-Expected: `react@19.2.3`, `react-native@0.86.3`, sem `invalid`/`ERESOLVE`.
+Expected: `react@19.2.3`, `react-native@0.86.3`, sem `invalid`/`ERESOLVE`. `-E` grava a versão exata no `package.json` — o Re.Pack fixa o Rspack em 1.6.0 de propósito (1.6.2+ quebra a ordem dos polyfills do MF v2), e a navegação fica na combinação que o Re.Pack testa com screens 4.26.2.
 
 - [ ] **Step 3: Trocar Metro por Re.Pack**
 
@@ -1652,7 +1657,7 @@ Apagar `metro.config.js`. Criar `react-native.config.js`:
 
 ```js
 module.exports = {
-  commands: require('@callstack/repack/commands/rspack'),
+  commands: require('@callstack/repack/commands'),
 }
 ```
 
@@ -1747,7 +1752,7 @@ Expected: `Pod installation complete!`. (Leva alguns minutos.)
 ```bash
 cd /Users/romeroalmeida/Romero/estudos/estudo-mf
 git add host-rn
-git status --short host-rn | head -50   # conferir: nada de Pods/, build/, node_modules/
+git status --short host-rn | grep -E 'Pods/|/build/|node_modules|vendor/'   # tem que sair vazio
 git commit -m "chore(host-rn): projeto RN 0.86.3 com Re.Pack no lugar do Metro"
 ```
 
@@ -1760,6 +1765,7 @@ git commit -m "chore(host-rn): projeto RN 0.86.3 com Re.Pack no lugar do Metro"
 - Create: `host-rn/src/features/busca/screens/TelaBusca.tsx`
 - Create: `host-rn/src/features/veiculo/screens/TelaVeiculo.tsx`
 - Modify: `host-rn/index.js`
+- Delete: `host-rn/App.tsx`, `host-rn/__tests__/`
 
 - [ ] **Step 1: `src/remotes.d.ts`** — mesmo conteúdo do host-react:
 
@@ -1971,8 +1977,8 @@ Expected: sem erros.
 - [ ] **Step 9: Commit**
 
 ```bash
+git rm -r --cached --quiet host-rn/App.tsx host-rn/__tests__
 git add host-rn/src host-rn/index.js host-rn/tsconfig.json
-git rm -r --cached host-rn/App.tsx host-rn/__tests__ 2>/dev/null; git add -u host-rn
 git commit -m "feat(host-rn): host nativo carregando a busca via Module Federation"
 ```
 
@@ -1991,13 +1997,13 @@ Conferir `http://localhost:9000/ios/mf-manifest.json` e `http://localhost:8081` 
 Run: `cd host-rn && npx react-native run-ios --simulator "iPhone 17" --no-packager` (timeout longo; o primeiro build leva vários minutos)
 Expected: `BUILD SUCCEEDED` e o app aberto no simulador.
 
-- [ ] **Step 3: Roteiro** (screenshots com `xcrun simctl io booted screenshot /tmp/estudo-mf-<passo>.png` e Read da imagem; toques e digitação pelo usuário quando a automação não alcançar — pedir a ele e conferir o screenshot)
+- [ ] **Step 3: Roteiro** (UDIDs em `xcrun simctl list devices available`; screenshots com `xcrun simctl io booted screenshot /tmp/estudo-mf-<passo>.png` e Read da imagem; toques e digitação pelo usuário quando a automação não alcançar — pedir a ele e conferir o screenshot)
 
 1. Tela "Garagem · host app", borda tracejada "remote: busca", "30 carros encontrados", botão "Filtros" (iPhone em retrato = layout estreito).
 2. Abrir "Filtros", marcar Honda, "Ver 4 carros" → lista só com Honda; botão "Filtros (1)".
 3. Tocar num carro → tela de detalhe do host. "Voltar para a busca" → mesma lista filtrada.
-4. Simulador de iPad (`--simulator "iPad Air 11-inch (M3)"` ou o iPad disponível em `xcrun simctl list devices available`) → painel lateral.
-5. Matar o servidor da 9000 e recarregar o app (Cmd+R no simulador) → "Busca indisponível". Subir a 9000 de novo e tocar "Tentar de novo" → busca volta.
+4. Desligar o iPhone (`xcrun simctl shutdown <UDID>`; com dois simuladores ligados o `booted` fica ambíguo) e usar o simulador de iPad (`--simulator "iPad Air 11-inch (M3)"` ou o iPad disponível em `xcrun simctl list devices available`) → painel lateral.
+5. Matar o servidor da 9000 (`lsof -ti tcp:9000 | xargs kill`) e reabrir o app (`xcrun simctl terminate <UDID> org.reactjs.native.example.HostRn && xcrun simctl launch <UDID> org.reactjs.native.example.HostRn`) → "Busca indisponível". Um toast vermelho do LogBox ao lado é esperado (o erro é capturado, mas passa pelo `console.error`). Subir a 9000 de novo, esperar responder e tocar "Tentar de novo" → busca volta.
 6. Log do host-rn sem "Invalid hook call" e sem aviso de versão de shared.
 
 - [ ] **Step 4: Se algo falhar**, @superpowers:systematic-debugging, commit `fix(...)`, repetir. Ao final, parar os servidores.
