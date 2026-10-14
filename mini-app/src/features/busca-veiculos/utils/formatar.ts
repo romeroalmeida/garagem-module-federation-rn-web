@@ -1,3 +1,5 @@
+import type { Cor } from '../types'
+
 const moeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -15,3 +17,17 @@ export const formatarVerCarros = (n: number) => (n === 1 ? 'Ver 1 carro' : `Ver 
 
 export const ROTULO_CAMBIO = { manual: 'Manual', automatico: 'Automático' } as const
 export const ROTULO_COMBUSTIVEL = { flex: 'Flex', diesel: 'Diesel', eletrico: 'Elétrico' } as const
+export const ROTULO_COR: Record<Cor, string> = {
+  prata: 'Prata',
+  preto: 'Preto',
+  branco: 'Branco',
+  cinza: 'Cinza',
+  vermelho: 'Vermelho',
+  azul: 'Azul',
+  verde: 'Verde',
+  amarelo: 'Amarelo',
+  laranja: 'Laranja',
+  marrom: 'Marrom',
+  bege: 'Bege',
+  vinho: 'Vinho',
+}

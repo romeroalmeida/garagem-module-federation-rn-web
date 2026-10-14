@@ -1,15 +1,32 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { Card, Icone, Silhueta, cores, tipo, type NomeIcone } from '@garagem/ds'
+import { Card, FotoCarro, Icone, Selo, cores, tipo, type NomeIcone } from '@garagem/ds'
 import type { Veiculo } from '../types'
-import { ROTULO_CAMBIO, ROTULO_COMBUSTIVEL, formatarKm, formatarPreco } from '../utils/formatar'
+import { ROTULO_CAMBIO, ROTULO_COMBUSTIVEL, ROTULO_COR, formatarKm, formatarPreco } from '../utils/formatar'
 
 type Props = { veiculo: Veiculo; onPress: () => void }
 
 export function CardVeiculo({ veiculo, onPress }: Props) {
-  const rotulo = `${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${ROTULO_CAMBIO[veiculo.cambio]}, ${ROTULO_COMBUSTIVEL[veiculo.combustivel]}, ${veiculo.cidade} (${veiculo.uf}), ${formatarPreco(veiculo.preco)}`
+  const rotulo = `${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${ROTULO_COR[veiculo.cor]}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${ROTULO_CAMBIO[veiculo.cambio]}, ${ROTULO_COMBUSTIVEL[veiculo.combustivel]}, ${veiculo.cidade} (${veiculo.uf}), ${formatarPreco(veiculo.preco)}`
   return (
     <Card onPress={onPress} rotulo={rotulo}>
-      <Silhueta carroceria={veiculo.carroceria} />
+      <View style={estilos.foto}>
+        <FotoCarro
+          fonte={veiculo.foto}
+          carroceria={veiculo.carroceria}
+          credito={veiculo.creditoFoto && { autor: veiculo.creditoFoto.autor, licenca: veiculo.creditoFoto.licenca }}
+        />
+        {/* flex é o padrão: só elétrico e diesel ganham selo */}
+        {veiculo.combustivel === 'eletrico' && (
+          <View style={estilos.selo}>
+            <Selo tom="positivo" texto="Elétrico" />
+          </View>
+        )}
+        {veiculo.combustivel === 'diesel' && (
+          <View style={estilos.selo}>
+            <Selo tom="neutro" texto="Diesel" />
+          </View>
+        )}
+      </View>
       <View style={estilos.corpo}>
         <Text style={[tipo.corpoForte, estilos.nome]} numberOfLines={1}>
           {veiculo.marca} {veiculo.modelo}
@@ -40,6 +57,8 @@ function Spec({ icone, texto }: { icone: NomeIcone; texto: string }) {
 }
 
 const estilos = StyleSheet.create({
+  foto: { position: 'relative' },
+  selo: { position: 'absolute', top: 10, left: 10 },
   corpo: { gap: 6, padding: 16 },
   nome: { textTransform: 'uppercase' },
   specs: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4 },
