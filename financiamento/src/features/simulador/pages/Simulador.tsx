@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { Botao, Chip, Titulo, cores, raios, tipo } from '@garagem/ds'
+import { StyleSheet, Text, View } from 'react-native'
+import { Botao, Campo, Chip, Titulo, cores, raios, sombras, tipo } from '@garagem/ds'
 import type { Prazo, Simulacao, SimuladorProps } from '../types'
 import { entradaPorPercentual, entradaValida, lerNumero, limitesEntrada } from '../utils/entrada'
 import { formatarMoeda, formatarReais, formatarTaxa } from '../utils/formatar'
@@ -34,13 +34,12 @@ export default function Simulador({ preco, onInteresse }: SimuladorProps) {
           return <Chip key={percentual} papel="radio" rotulo={`${percentual}%`} selecionado={entrada === valor} onPress={() => setEntrada(valor)} />
         })}
       </View>
-      <TextInput
+      <Campo
         value={entrada === undefined ? '' : String(entrada)}
         onChangeText={(texto) => setEntrada(lerNumero(texto))}
         inputMode="numeric"
         maxLength={9}
         aria-label="Entrada"
-        style={[tipo.corpo, estilos.input]}
       />
       <Text style={tipo.legenda}>
         mín. {formatarReais(limites.min)} · máx. {formatarReais(limites.max)}
@@ -77,17 +76,9 @@ export default function Simulador({ preco, onInteresse }: SimuladorProps) {
 }
 
 const estilos = StyleSheet.create({
-  caixa: { gap: 12, padding: 16, borderRadius: raios.card, borderWidth: 1, borderColor: cores.line, backgroundColor: cores.bg },
+  caixa: { gap: 12, padding: 16, borderRadius: raios.card, backgroundColor: cores.bg, boxShadow: sombras.card },
   linha: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  input: {
-    minHeight: 48,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: cores.inkSoft,
-    borderRadius: raios.botao,
-    backgroundColor: cores.bg,
-  },
   resultado: { gap: 4, padding: 16, borderRadius: raios.card, backgroundColor: cores.ink },
   parcela: { ...tipo.preco, fontSize: 26, color: cores.accent },
   taxa: { ...tipo.legenda, color: cores.bg },
