@@ -3,7 +3,7 @@ import { formatarKm, formatarPreco, formatarResultado, formatarVerCarros } from 
 
 describe('formatar', () => {
   it('preço em reais sem centavos', () => {
-    expect(formatarPreco(112900)).toBe('R$ 112.900')
+    expect(formatarPreco(112900)).toBe('R$\u00A0112.900')
   })
 
   it('km com separador de milhar', () => {

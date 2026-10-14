@@ -6,8 +6,7 @@ const moeda = new Intl.NumberFormat('pt-BR', {
 })
 const inteiro = new Intl.NumberFormat('pt-BR')
 
-// Intl.NumberFormat insere um espaço não separável (U+00A0) entre "R$" e o número; normaliza para espaço comum.
-export const formatarPreco = (n: number) => moeda.format(n).replace(' ', ' ')
+export const formatarPreco = (n: number) => moeda.format(n)
 export const formatarKm = (n: number) => `${inteiro.format(n)} km`
 export const formatarResultado = (n: number) =>
   n === 1 ? '1 carro encontrado' : `${n} carros encontrados`
