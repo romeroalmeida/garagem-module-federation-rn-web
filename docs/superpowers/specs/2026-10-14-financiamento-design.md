@@ -101,7 +101,8 @@ host-rn/src/                               (mudanças, simétricas)
 `Fronteira` e `LimiteDeErro` sobem para `shared/` porque agora duas features os usam (regra
 feature-based do Romero: 2+ features → `shared/`). No host-rn a `Fronteira` ganha `preencher`:
 `flex: 1` dentro do `ScrollView` do detalhe colapsaria para altura zero, então só a busca (que ocupa
-a tela) usa. Pelo mesmo motivo o fallback do `LimiteDeErro` nativo não tem `flex: 1`.
+a tela) usa. Pelo mesmo motivo o fallback do `LimiteDeErro` nativo usa `flexGrow: 1` (não `flex: 1`): centraliza na
+caixa da busca e, no `ScrollView`, fica do tamanho do conteúdo.
 
 Também muda o `README.md` da raiz: portas, instalação, comandos e testes do `financiamento`.
 
@@ -166,7 +167,8 @@ Um bloco só, sem modal nem navegação interna:
 - Entrada: `TextInput` com `inputMode="numeric"`, `maxLength={9}`, `aria-label="Entrada"`;
   digitar recalcula na hora.
 - Entrada inválida: some a linha da parcela e aparece "Entrada entre R$ 22.580 e R$ 101.610";
-  "Tenho interesse" fica desabilitado (`disabled` + `aria-disabled`).
+  "Tenho interesse" fica desabilitado (`disabled` — o RNW emite `aria-disabled`; no RN vira
+  `accessibilityState.disabled`).
 - `SeletorPrazo`: `View` com `role="radiogroup"` e um `Pressable` por prazo com `role="radio"`
   e `aria-checked`; o selecionado em roxo (`#7c3aed`, mesma cor da busca).
 - Formatação com `Intl.NumberFormat('pt-BR')` criada no escopo do módulo; moeda com

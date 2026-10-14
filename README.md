@@ -1,4 +1,4 @@
-# estudo-mf — busca de veículos via Module Federation
+# estudo-mf — micro-frontends com Module Federation (busca + financiamento)
 
 Dois micro-frontends (código React Native) — a **busca** e o **simulador de financiamento**, de "times"
 diferentes — carregados em tempo de execução por um host web e por um host nativo. Os remotes não se
@@ -51,11 +51,10 @@ cd host-rn && npx react-native run-ios --simulator "iPhone 17" --no-packager
 
 ## O que observar
 
-- A borda tracejada `remote: busca` marca onde termina o host e começa o mini-app.
-- Derrube o servidor de **um** remote e recarregue: só a caixa dele mostra "… indisponível"; o resto segue
-  (ex.: sem o 3003, o detalhe do carro e a busca funcionam, só o simulador some).
-- Derrube o servidor do remote e recarregue: o host mostra "Busca indisponível". No app (dev), o
-  LogBox abre antes em tela cheia — o Re.Pack reporta a falha do remote como erro fatal; feche-o.
+- As bordas tracejadas `remote: busca` e `remote: financiamento` marcam onde termina o host e começa cada remote.
+- Derrube o servidor de um remote e recarregue: só a caixa dele mostra "… indisponível" (sem a 3003, o
+  detalhe do carro e a busca seguem). No app (dev), o LogBox abre antes em tela cheia — o Re.Pack reporta a
+  falha do remote como erro fatal; feche-o.
 - Na web, os filtros vão para a URL; no app, a pilha de telas mantém a busca viva.
 - Para parar um servidor: `lsof -ti tcp:<porta> -sTCP:LISTEN | xargs kill` — o `-sTCP:LISTEN` é obrigatório: sem ele
   o `kill` derruba também quem está conectado (Chrome, o app no simulador). Nunca na 9000 (Docker) nem na 3002 (meu-tramite).
