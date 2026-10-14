@@ -164,7 +164,7 @@ const familias = Platform.select({
     bold: 'Figtree-Bold',
   },
 })
-const peso = (fontWeight: '400' | '600' | '700'): TextStyle => (Platform.OS === 'web' ? { fontWeight } : {})
+const peso = (fontWeight: '400' | '600' | '700'): Pick<TextStyle, 'fontWeight'> => (Platform.OS === 'web' ? { fontWeight } : {})
 
 export const tipo = {
   display: { fontFamily: familias.display, textTransform: 'uppercase', letterSpacing: 0.5, color: cores.ink },
@@ -498,7 +498,7 @@ Expected: `package/package.json`, `package/dist/index.js`, `package/dist/index.d
 - [ ] **Step 2:** `printf 'dist\n' > design-system/.gitignore` (o `.tgz` é o artefato publicado e vai para o git; o `dist/` não).
 - [ ] **Step 3: Commit** — `git add design-system/.gitignore design-system/garagem-ds-1.0.0.tgz` · `build(ds): pacote 1.0.0`
 
-> **Depois da revisão:** saiu a **1.0.1** (silhuetas de hatch e SUV redesenhadas, contorno nas rodas, Espaço nos chips da web, `Titulo` com `role="heading"` + `aria-level`, Skeleton sem congelar, `peso` com `Pick<TextStyle, 'fontWeight'>`). As tasks seguintes instalam `garagem-ds-1.0.1.tgz`.
+> **Depois da revisão:** saiu a **1.0.1** (silhuetas de hatch e SUV redesenhadas, contorno nas rodas, Espaço nos chips da web, `Titulo` com `role="heading"` + `aria-level`, Skeleton sem congelar, `peso` com `Pick<TextStyle, 'fontWeight'>`). Depois, a **1.0.2**: ícones importados um a um (`lucide-react-native/icons/<nome>`) — o barrel traz o ícone `infinity`, que declara `const Infinity`, e o Hermes recusa o arquivo (nenhum bundle nativo compilava). As tasks seguintes instalam `garagem-ds-1.0.2.tgz` e o host-rn já está nela.
 - **Regra para depois:** mudou o DS → subir a versão (1.0.1…), `npm run pacote`, e nos 4 projetos `npm i -E ../design-system/garagem-ds-<versão>.tgz` (caminho explícito) e reiniciar os dev servers. Reempacotar a mesma versão é invisível: `npm install` diz "up to date" e `npm ci` restaura o conteúdo antigo do cache pelo hash do lockfile.
 
 ---
@@ -512,7 +512,7 @@ Expected: `package/package.json`, `package/dist/index.js`, `package/dist/index.d
 - [ ] **Step 1: Dependências**
 
 ```bash
-cd host-rn && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.1.tgz
+cd host-rn && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.2.tgz
 npm ls react react-native react-native-svg lucide-react-native @garagem/ds --depth=0
 ```
 Expected: react 19.2.3, react-native 0.86.3, svg 15.15.5, lucide 1.57.0, `@garagem/ds@1.0.1`.
@@ -596,16 +596,19 @@ Em `Veiculo`, depois de `uf: string`: `carroceria: Carroceria`, `cambio: Cambio`
 Em `Filtros`, depois de `kmMax?: number`: `/** ausente = relevância (ordem dos dados) */ ordem?: Ordem`.
 No barrel `index.ts`, exportar também os tipos novos: `export type { BuscaVeiculosProps, Cambio, Carroceria, Combustivel, Filtros, Ordem, Veiculo } from './types'`.
 
-- [ ] **Step 2: Dados** — rodar uma vez (escreve o JSON formatado como hoje):
+- [ ] **Step 2: Dados** — rodar uma vez (escreve o JSON no formato de hoje, `{ "id": … }` por linha). Em `services/veiculosService.ts`, a linha `const veiculos: Veiculo[] = dados` vira `const veiculos = dados as Veiculo[]` (o JSON tipa `carroceria` como `string`).
 
 ```bash
-cd mini-app/src/features/busca-veiculos/services && node -e "
+cd mini-app/src/features/busca-veiculos/services && node <<'EOF'
+
 const fs=require('fs'); const v=JSON.parse(fs.readFileSync('veiculos.json','utf8'))
 const c={1:['sedan','automatico','flex'],2:['sedan','automatico','flex'],3:['suv','automatico','flex'],4:['hatch','automatico','flex'],5:['sedan','automatico','flex'],6:['suv','automatico','flex'],7:['hatch','manual','flex'],8:['picape','automatico','diesel'],9:['hatch','automatico','flex'],10:['suv','automatico','flex'],11:['suv','automatico','flex'],12:['hatch','manual','flex'],13:['hatch','manual','flex'],14:['sedan','automatico','flex'],15:['suv','automatico','flex'],16:['picape','automatico','diesel'],17:['hatch','manual','flex'],18:['sedan','automatico','flex'],19:['suv','automatico','flex'],20:['picape','automatico','diesel'],21:['hatch','manual','flex'],22:['hatch','manual','flex'],23:['sedan','automatico','flex'],24:['suv','automatico','flex'],25:['suv','automatico','flex'],26:['suv','automatico','flex'],27:['suv','automatico','diesel'],28:['hatch','manual','flex'],29:['suv','automatico','flex'],30:['hatch','manual','flex']}
 const novo=v.map(x=>{const [carroceria,cambio,combustivel]=c[x.id];return {...x,carroceria,cambio,combustivel}})
 novo.push({id:'31',marca:'BYD',modelo:'Dolphin',versao:'GS 180',ano:2024,km:8000,preco:149800,cidade:'Resende',uf:'RJ',carroceria:'hatch',cambio:'automatico',combustivel:'eletrico'})
-fs.writeFileSync('veiculos.json','[\n'+novo.map(x=>'  '+JSON.stringify(x).replace(/\"([a-z]+)\":/g,'\"\$1\": ').replace(/,\"/g,', \"')).join(',\n')+'\n]\n')"
-node -e "const v=require('./veiculos.json');console.log(v.length, new Set(v.map(x=>x.marca)).size, v.filter(x=>!x.carroceria).length)"
+const linha=(x)=>'  { '+Object.entries(x).map(([k,v])=>JSON.stringify(k)+': '+JSON.stringify(v)).join(', ')+' }'
+fs.writeFileSync('veiculos.json','[\n'+novo.map(linha).join(',\n')+'\n]\n')
+console.log(novo.length, new Set(novo.map(x=>x.marca)).size, novo.filter(x=>x.carroceria===undefined).length)
+EOF
 ```
 Expected: `31 9 0`.
 
@@ -712,7 +715,7 @@ export const ROTULO_COMBUSTIVEL = { flex: 'Flex', diesel: 'Diesel', eletrico: 'E
 
 no topo:
 ```ts
-import type { Filtros, Ordem } from '../types'
+import type { Filtros } from '../types'
 import { formatarKm, formatarPreco } from './formatar'
 import { ORDENS } from './ordenar'
 ```
@@ -737,17 +740,16 @@ export function chipsAtivos(f: Filtros): ChipAtivo[] {
   return chips
 }
 ```
-(`Ordem` entra no import só se o tsc pedir; com `verbatimModuleSyntax` desligado no mini-app, import de tipo não usado é aviso, não erro — remover se sobrar.)
 
 - [ ] **Step 9: Rodar e ver passar** — `cd mini-app && npx vitest run && npx tsc --noEmit` → todos passando, typecheck limpo.
 
-- [ ] **Step 10: Commit** — `git add mini-app/src/features/busca-veiculos/types.ts mini-app/src/features/busca-veiculos/index.ts mini-app/src/features/busca-veiculos/services/veiculos.json mini-app/src/features/busca-veiculos/utils` · `feat(busca): carroceria, câmbio, combustível, ordenação e chips de filtros ativos`
+- [ ] **Step 10: Commit** — `git add mini-app/src/features/busca-veiculos/types.ts mini-app/src/features/busca-veiculos/index.ts mini-app/src/features/busca-veiculos/services/veiculos.json mini-app/src/features/busca-veiculos/services/veiculosService.ts mini-app/src/features/busca-veiculos/utils` · `feat(busca): carroceria, câmbio, combustível, ordenação e chips de filtros ativos`
 
 ### Task 6: Visual da busca com o DS + shared
 
 **Files:** Modify `mini-app/package.json`, `mini-app/rspack.web.config.mjs`, `mini-app/rspack.native.config.mjs`, `components/BarraBusca.tsx`, `components/CardVeiculo.tsx`, `components/PainelFiltros.tsx`, `pages/BuscaVeiculos.tsx`
 
-- [ ] **Step 1: Dependências** — `cd mini-app && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.1.tgz`
+- [ ] **Step 1: Dependências** — `cd mini-app && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.2.tgz`
 
 - [ ] **Step 2: `rspack.web.config.mjs`**
   - imports no topo: `import pkg from './package.json' with { type: 'json' }`, `import dsPkg from '@garagem/ds/package.json' with { type: 'json' }`, `import rnwPkg from 'react-native-web/package.json' with { type: 'json' }`;
@@ -769,7 +771,7 @@ export function chipsAtivos(f: Filtros): ChipAtivo[] {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Figtree:wght@400;600;700&display=swap" />
 ```
-    e no `<style>` acrescentar: `body { font-family: Figtree, system-ui, sans-serif } :focus-visible { outline: 2px solid #171717; outline-offset: 2px; box-shadow: 0 0 0 4px #00E0A0 }`.
+    e no `<style>` acrescentar: `body { font-family: Figtree, system-ui, sans-serif } :focus-visible { outline: 2px solid #171717; outline-offset: 0; box-shadow: 0 0 0 4px #00E0A0 }`.
 
 - [ ] **Step 3: `rspack.native.config.mjs`** — imports `pkg` e `dsPkg` como acima; em `shared`, depois de `'react-native'`:
 ```js
@@ -1116,9 +1118,12 @@ const estilos = StyleSheet.create({
 ```bash
 cd mini-app && npx tsc --noEmit && npx vitest run
 npx rspack build --config rspack.web.config.mjs && node -e "const m=require('./dist/web/mf-manifest.json');console.log(m.shared.map(s=>s.name+'@'+s.version).join(', '))" && rm -rf dist
-npx react-native bundle --platform ios --dev true --entry-file index.native.js --bundle-output /tmp/estudo-mf-busca-ios.bundle --config rspack.native.config.mjs && rm -rf build
+rm -f /tmp/estudo-mf-busca-ios.bundle
+npx react-native bundle --platform ios --dev true --entry-file index.native.js --bundle-output /tmp/estudo-mf-busca-ios.bundle --config rspack.native.config.mjs > /tmp/estudo-mf-busca-bundle.log 2>&1
+# o bundle do Re.Pack sai com código 0 mesmo com erro de compilação: conferir o arquivo e o log
+test -s /tmp/estudo-mf-busca-ios.bundle && ! grep -qiE "compiled with [0-9]+ error" /tmp/estudo-mf-busca-bundle.log && echo BUNDLE_OK; rm -rf build
 ```
-Expected: typecheck limpo; testes passando; shared do manifesto web com react, react-dom, react-native (versão 0.21.4 = RNW), @garagem/ds, react-native-svg — **sem** lucide; bundle nativo compila (se o comando `bundle` do Re.Pack pedir outras flags, ajustar e reportar).
+Expected: typecheck limpo; testes passando; shared do manifesto web com react, react-dom, react-native (versão 0.21.4 = RNW), @garagem/ds, react-native-svg — **sem** lucide; `BUNDLE_OK`.
 
 - [ ] **Step 9: Commit** — `git add mini-app/package.json mini-app/package-lock.json mini-app/rspack.web.config.mjs mini-app/rspack.native.config.mjs mini-app/src/features/busca-veiculos/components mini-app/src/features/busca-veiculos/pages` · `feat(busca): visual do design system (card, chips, painel, busca em pílula)`
 
@@ -1251,7 +1256,7 @@ const estilos = StyleSheet.create({
 })
 ```
 
-- [ ] **Step 7: Checks** — como na Task 6, Step 8, em `financiamento/` (`index.native.js`, bundle em `/tmp/estudo-mf-fin-ios.bundle`).
+- [ ] **Step 7: Checks** — como na Task 6, Step 8, em `financiamento/` (`index.native.js`, bundle em `/tmp/estudo-mf-fin-ios.bundle`, log em `/tmp/estudo-mf-fin-bundle.log`; precisa sair `BUNDLE_OK`).
 - [ ] **Step 8: Commit** — `git add financiamento/package.json financiamento/package-lock.json financiamento/rspack.web.config.mjs financiamento/rspack.native.config.mjs financiamento/src/features/simulador` (inclui o `git rm` do SeletorPrazo) · `feat(financiamento): visual do design system com chips de entrada e bloco escuro da parcela`
 
 ---
@@ -1281,10 +1286,10 @@ const estilos = StyleSheet.create({
 em `gravarFiltros`, antes do `return`: `if (filtros.ordem) params.set('ordem', filtros.ordem)`.
 - [ ] **Step 4:** `npx vitest run` → PASS (5 testes).
 
-- [ ] **Step 5: Dependências** — `cd host-react && npm install -E react-native-web@0.21.4 react-native@0.86.3 react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.1.tgz` (o `react-native` entra fixo para o npm não escolher outra versão ao satisfazer peers; o bundle usa o react-native-web pelo alias).
+- [ ] **Step 5: Dependências** — `cd host-react && npm install -E react-native-web@0.21.4 react-native@0.86.3 react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.2.tgz` (o `react-native` entra fixo para o npm não escolher outra versão ao satisfazer peers; o bundle usa o react-native-web pelo alias).
 
 - [ ] **Step 6: `rspack.config.mjs`**
-  - imports: `pkg` (já existe), `dsPkg` e `rnwPkg` como na Task 6;
+  - imports: `import pkg from './package.json' with { type: 'json' }` (**não existe hoje** no host-react), `dsPkg` e `rnwPkg` como na Task 6;
   - `resolve.extensions`: `['.web.tsx', '.web.ts', '.tsx', '.ts', '.web.js', '.js', '.json']`;
   - `resolve.alias`: `{ 'react-native$': 'react-native-web', '@': path.resolve(__dirname, 'src') }`;
   - `shared`: o mesmo bloco web da Task 6 Step 2 (react, react-dom, react-native→RNW, @garagem/ds, react-native-svg);
@@ -1478,8 +1483,9 @@ const estilos = {
   specs: { display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, margin: 0 },
   specRotulo: { ...tipo.legenda },
   specValor: { ...tipo.corpoForte, margin: 0 },
-  simulador: { display: 'flex', flexDirection: 'column', gap: 12, scrollMarginTop: 72 },
-  lateral: { position: 'sticky', top: 72, display: 'flex', flexDirection: 'column', gap: 12 },
+  simulador: { display: 'flex', flexDirection: 'column', gap: 12 },
+  // o scroll é do <main> (abaixo do header), então o sticky conta a partir dele
+  lateral: { position: 'sticky', top: 16, display: 'flex', flexDirection: 'column', gap: 12 },
   preco: { ...tipo.preco, fontSize: 28, margin: 0 },
   barra: {
     position: 'fixed',
@@ -1506,7 +1512,7 @@ const estilos = {
 **Files:** Modify `host-rn/src/app/routes/Navegacao.tsx`, `src/features/busca/components/RemoteBusca.tsx`, `src/features/veiculo/components/RemoteFinanciamento.tsx`, `src/features/veiculo/screens/TelaVeiculo.tsx`
 
 - [ ] **Step 1: `Navegacao.tsx`** — no `<Stack.Navigator>`: `screenOptions={{ headerTitleStyle: { fontFamily: tipo.display.fontFamily, color: cores.ink }, headerShadowVisible: false }}` (import `{ cores, tipo } from '@garagem/ds'`); título da Busca: `'GARAGEM · host app'`.
-- [ ] **Step 2: Skeletons** — fallback do `Suspense` no `RemoteBusca`: `<View style={estilos.carregando}>{[0, 1, 2].map((i) => <Skeleton key={i} largura="100%" altura={300} raio={16} />)}</View>` (`carregando: { gap: 16, padding: 16 }`); no `RemoteFinanciamento`: `<View style={estilos.carregando}><Skeleton largura="100%" altura={460} raio={16} /></View>` (`carregando: { padding: 8 }`). Import `Skeleton` de `@garagem/ds`; remover o estilo `carregando` de texto antigo.
+- [ ] **Step 2: Skeletons** — fallback do `Suspense` no `RemoteBusca`: `<View style={estilos.carregando}>{[0, 1, 2].map((i) => <Skeleton key={i} largura="100%" altura={300} raio={16} />)}</View>` (`carregando: { gap: 16, padding: 16 }`); no `RemoteFinanciamento`: `<View style={estilos.carregando}><Skeleton largura="100%" altura={460} raio={16} /></View>` (`carregando: { padding: 8 }`). Import `Skeleton` de `@garagem/ds`; no import de `react-native` trocar `Text` por `View` (o `Text` deixa de ser usado); remover o estilo `carregando` de texto antigo.
 - [ ] **Step 3: `TelaVeiculo.tsx`** (substituir)
 
 ```tsx

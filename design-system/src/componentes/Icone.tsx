@@ -1,4 +1,14 @@
-import { Calendar, Check, Cog, Fuel, Gauge, MapPin, Search, SlidersHorizontal, X } from 'lucide-react-native'
+// Um import por ícone: o barrel do lucide traz o ícone "infinity", que declara `const Infinity`
+// e o parser do Hermes recusa ("shadows a global property") — nenhum bundle nativo compilaria.
+import Calendar from 'lucide-react-native/icons/calendar'
+import Check from 'lucide-react-native/icons/check'
+import Cog from 'lucide-react-native/icons/cog'
+import Fuel from 'lucide-react-native/icons/fuel'
+import Gauge from 'lucide-react-native/icons/gauge'
+import MapPin from 'lucide-react-native/icons/map-pin'
+import Search from 'lucide-react-native/icons/search'
+import SlidersHorizontal from 'lucide-react-native/icons/sliders-horizontal'
+import X from 'lucide-react-native/icons/x'
 import { cores } from '../tokens'
 
 const ICONES = { Calendar, Check, Cog, Fuel, Gauge, MapPin, Search, SlidersHorizontal, X }
