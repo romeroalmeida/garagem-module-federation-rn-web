@@ -1,0 +1,32 @@
+{
+  "name": "mini-app",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:web": "rspack serve --config rspack.web.config.mjs",
+    "dev:native": "react-native start --config rspack.native.config.mjs --port 9000",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-web": "0.21.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@callstack/repack": "5.4.2",
+    "@module-federation/enhanced": "2.9.2",
+    "@react-native-community/cli": "20.2.0",
+    "@react-native-community/cli-platform-ios": "20.2.0",
+    "@react-native/babel-preset": "0.86.3",
+    "@rspack/cli": "1.6.0",
+    "@rspack/core": "1.6.0",
+    "@swc/helpers": "~0.5.17",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "~5.9.0",
+    "vitest": "^4.1.0"
+  }
+}
