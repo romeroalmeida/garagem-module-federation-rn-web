@@ -6,3 +6,11 @@ declare module 'busca/BuscaVeiculos' {
   const BuscaVeiculos: ComponentType<BuscaVeiculosProps>
   export default BuscaVeiculos
 }
+
+declare module 'financiamento/Simulador' {
+  import type { ComponentType } from 'react'
+  import type { SimuladorProps } from '@financiamento/tipos'
+
+  const Simulador: ComponentType<SimuladorProps>
+  export default Simulador
+}

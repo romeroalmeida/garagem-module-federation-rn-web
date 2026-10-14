@@ -34,7 +34,10 @@ export default Repack.defineRspackConfig((env) => {
       new Repack.RepackPlugin(),
       new Repack.plugins.ModuleFederationPluginV2({
         name: 'hostRn',
-        remotes: { busca: `busca@http://localhost:8082/${platform}/mf-manifest.json` },
+        remotes: {
+          busca: `busca@http://localhost:8082/${platform}/mf-manifest.json`,
+          financiamento: `financiamento@http://localhost:8083/${platform}/mf-manifest.json`,
+        },
         dts: false,
         // version-first buscaria o manifesto na inicialização e derrubaria o app com o remote fora
         shareStrategy: 'loaded-first',
