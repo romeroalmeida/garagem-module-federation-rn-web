@@ -4,7 +4,7 @@ import { ordenarVeiculos } from './ordenar'
 
 const v = (id: string, preco: number, km: number, ano: number): Veiculo => ({
   id, marca: 'X', modelo: 'Y', versao: 'Z', ano, km, preco, cidade: 'C', uf: 'RJ',
-  carroceria: 'hatch', cambio: 'manual', combustivel: 'flex',
+  carroceria: 'hatch', cambio: 'manual', combustivel: 'flex', cor: 'prata',
 })
 const lista = [v('a', 100, 30, 2020), v('b', 50, 10, 2022), v('c', 100, 20, 2021)]
 const ids = (l: Veiculo[]) => l.map((x) => x.id)

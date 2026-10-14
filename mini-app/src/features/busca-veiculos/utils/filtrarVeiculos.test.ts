@@ -5,7 +5,7 @@ import { filtrarVeiculos } from './filtrarVeiculos'
 const carro = (parcial: Partial<Veiculo> & Pick<Veiculo, 'id'>): Veiculo => ({
   marca: 'Honda', modelo: 'Civic', versao: 'EXL 2.0', ano: 2020, km: 45000,
   preco: 100000, cidade: 'Volta Redonda', uf: 'RJ',
-  carroceria: 'sedan', cambio: 'automatico', combustivel: 'flex', ...parcial,
+  carroceria: 'sedan', cambio: 'automatico', combustivel: 'flex', cor: 'prata', ...parcial,
 })
 
 const veiculos: Veiculo[] = [
