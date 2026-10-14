@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { FlatList, Modal, ScrollView, StyleSheet, Text, View, useWindowDimensions, type DimensionValue } from 'react-native'
-import { Botao, Chip, cores, tipo } from '@garagem/ds'
+import { Botao, Chip, Titulo, cores, raios, sombras, tipo } from '@garagem/ds'
 import { BarraBusca } from '../components/BarraBusca'
 import { CardVeiculo } from '../components/CardVeiculo'
 import { PainelFiltros } from '../components/PainelFiltros'
@@ -42,86 +42,104 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
   const larguraCelula = `${100 / colunas}%` as DimensionValue
 
   return (
-    <View style={estilos.raiz}>
-      {largo && (
-        <ScrollView style={estilos.lateral} contentContainerStyle={estilos.lateralConteudo} keyboardShouldPersistTaps="handled">
-          {painel}
-        </ScrollView>
-      )}
-
-      <View style={estilos.conteudo}>
-        <BarraBusca valor={filtros.texto} onChange={(texto) => atualizar({ ...filtros, texto })} />
-
-        {(!largo || chips.length > 0) && (
-          // ScrollView horizontal cresce e encolhe por padrão: sem flexGrow/flexShrink 0 a fileira vira 7px no celular
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            style={estilos.linhaChips}
-            contentContainerStyle={estilos.chips}
-          >
-            {!largo && (
-              <Chip icone="SlidersHorizontal" rotulo={ativos > 0 ? `Filtros (${ativos})` : 'Filtros'} onPress={() => setModalAberto(true)} />
-            )}
-            {chips.map((chip) => (
-              <Chip key={chip.id} rotulo={chip.rotulo} removivel onPress={() => atualizar(chip.sem)} />
-            ))}
-            {chips.length > 0 && (
-              <Chip rotulo="Limpar" onPress={() => atualizar({ ...FILTROS_VAZIOS, texto: filtros.texto, ordem: filtros.ordem })} />
-            )}
-          </ScrollView>
+    // fundo em largura total; o conteúdo continua centralizado em 1200
+    <View style={estilos.fundo}>
+      <View style={estilos.raiz}>
+        {largo && (
+          // a sombra fica no View de fora: no iOS, o recorte do ScrollView cortaria a sombra
+          <View style={estilos.lateral}>
+            <ScrollView contentContainerStyle={estilos.lateralConteudo} keyboardShouldPersistTaps="handled">
+              {painel}
+            </ScrollView>
+          </View>
         )}
 
-        <Text style={tipo.legenda}>{contador}</Text>
+        <View style={estilos.conteudo}>
+          <Titulo nivel={1}>Carros à venda</Titulo>
+          <BarraBusca valor={filtros.texto} onChange={(texto) => atualizar({ ...filtros, texto })} />
 
-        <FlatList
-          key={`colunas-${colunas}`}
-          numColumns={colunas}
-          data={resultado}
-          keyExtractor={(v) => v.id}
-          renderItem={({ item }) => (
-            <View style={[estilos.celula, { width: larguraCelula }]}>
-              <CardVeiculo veiculo={item} onPress={() => onSelecionarVeiculo(item)} />
-            </View>
+          {(!largo || chips.length > 0) && (
+            // ScrollView horizontal cresce e encolhe por padrão: sem flexGrow/flexShrink 0 a fileira vira 7px no celular
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              style={estilos.linhaChips}
+              contentContainerStyle={estilos.chips}
+            >
+              {!largo && (
+                <Chip icone="SlidersHorizontal" rotulo={ativos > 0 ? `Filtros (${ativos})` : 'Filtros'} onPress={() => setModalAberto(true)} />
+              )}
+              {chips.map((chip) => (
+                <Chip key={chip.id} rotulo={chip.rotulo} removivel onPress={() => atualizar(chip.sem)} />
+              ))}
+              {chips.length > 0 && (
+                <Chip rotulo="Limpar" onPress={() => atualizar({ ...FILTROS_VAZIOS, texto: filtros.texto, ordem: filtros.ordem })} />
+              )}
+            </ScrollView>
           )}
-          ListEmptyComponent={
-            <View style={estilos.vazio}>
-              <Text style={tipo.corpo}>Nenhum carro com esses filtros</Text>
-              <Botao rotulo="Limpar busca e filtros" onPress={() => atualizar(FILTROS_VAZIOS)} />
-            </View>
-          }
-          style={estilos.grade}
-          contentContainerStyle={estilos.lista}
-        />
-      </View>
 
-      <Modal
-        visible={modalAberto}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        allowSwipeDismissal
-        onRequestClose={() => setModalAberto(false)}
-      >
-        {/* rola e solta o teclado: o teclado numérico do iPhone não tem tecla de retorno */}
-        <ScrollView
-          style={estilos.modal}
-          contentContainerStyle={estilos.modalConteudo}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          automaticallyAdjustKeyboardInsets
+          <Text style={tipo.legenda}>{contador}</Text>
+
+          <FlatList
+            key={`colunas-${colunas}`}
+            numColumns={colunas}
+            data={resultado}
+            keyExtractor={(v) => v.id}
+            renderItem={({ item }) => (
+              <View style={[estilos.celula, { width: larguraCelula }]}>
+                <CardVeiculo veiculo={item} onPress={() => onSelecionarVeiculo(item)} />
+              </View>
+            )}
+            ListEmptyComponent={
+              <View style={estilos.vazio}>
+                <Text style={tipo.corpo}>Nenhum carro com esses filtros</Text>
+                <Botao rotulo="Limpar busca e filtros" onPress={() => atualizar(FILTROS_VAZIOS)} />
+              </View>
+            }
+            style={estilos.grade}
+            contentContainerStyle={estilos.lista}
+          />
+        </View>
+
+        <Modal
+          visible={modalAberto}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          allowSwipeDismissal
+          onRequestClose={() => setModalAberto(false)}
         >
-          {painel}
-          <Botao rotulo={formatarVerCarros(resultado.length)} onPress={() => setModalAberto(false)} />
-        </ScrollView>
-      </Modal>
+          {/* rola e solta o teclado: o teclado numérico do iPhone não tem tecla de retorno */}
+          <ScrollView
+            style={estilos.modal}
+            contentContainerStyle={estilos.modalConteudo}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            automaticallyAdjustKeyboardInsets
+          >
+            {painel}
+            <Botao rotulo={formatarVerCarros(resultado.length)} onPress={() => setModalAberto(false)} />
+          </ScrollView>
+        </Modal>
+      </View>
     </View>
   )
 }
 
 const estilos = StyleSheet.create({
-  raiz: { flex: 1, flexDirection: 'row', width: '100%', maxWidth: 1200, alignSelf: 'center', backgroundColor: cores.bg },
-  lateral: { width: 280, flexGrow: 0, flexShrink: 0, borderRightWidth: 1, borderRightColor: cores.line },
+  fundo: { flex: 1, backgroundColor: cores.surface },
+  raiz: { flex: 1, flexDirection: 'row', width: '100%', maxWidth: 1200, alignSelf: 'center' },
+  // painel branco flutuando no fundo surface; a margem direita é o padding do conteúdo
+  lateral: {
+    width: 280,
+    flexGrow: 0,
+    flexShrink: 0,
+    marginLeft: 16,
+    marginVertical: 16,
+    backgroundColor: cores.bg,
+    borderRadius: raios.card,
+    boxShadow: sombras.card,
+  },
   lateralConteudo: { padding: 16 },
   conteudo: { flex: 1, padding: 16, gap: 12 },
   // padding + margin negativa: o anel de foco (4px) não é cortado pelo overflow do scroller
