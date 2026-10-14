@@ -21,7 +21,9 @@ export function PaginaVeiculo() {
 
   return (
     <div style={estilos.pagina}>
-      <div style={estilos.foto}>{veiculo.marca[0]}</div>
+      <div style={estilos.foto} aria-hidden="true">
+        {veiculo.marca[0]}
+      </div>
       <h1 style={estilos.nome}>
         {veiculo.marca} {veiculo.modelo} <small style={estilos.versao}>{veiculo.versao}</small>
       </h1>

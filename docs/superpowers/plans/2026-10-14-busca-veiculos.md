@@ -48,18 +48,18 @@ estudo-mf/
 │   └── src/
 │       ├── index.tsx · bootstrap.tsx · remotes.d.ts
 │       ├── app/App.tsx · app/routes/router.tsx
-│       ├── app/layout/Layout.tsx · Fronteira.tsx · RemoteBusca.tsx
+│       ├── app/layout/Layout.tsx
 │       └── features/
-│           ├── busca/pages/PaginaBusca.tsx · busca/utils/filtrosUrl.ts (+ .test.ts)
+│           ├── busca/pages/PaginaBusca.tsx · busca/components/RemoteBusca.tsx · Fronteira.tsx
+│           ├── busca/utils/filtrosUrl.ts (+ .test.ts)
 │           └── veiculo/pages/PaginaVeiculo.tsx
 └── host-rn/                                gerado pelo RN CLI, depois ajustado
     ├── .ruby-version · react-native.config.js · rspack.config.mjs · index.js · tsconfig.json
     └── src/
         ├── remotes.d.ts
         ├── app/App.tsx · app/routes/Navegacao.tsx
-        ├── app/layout/Fronteira.tsx · RemoteBusca.tsx
         └── features/
-            ├── busca/screens/TelaBusca.tsx
+            ├── busca/screens/TelaBusca.tsx · busca/components/RemoteBusca.tsx · Fronteira.tsx
             └── veiculo/screens/TelaVeiculo.tsx
 ```
 
@@ -1167,6 +1167,8 @@ git commit -m "feat(host-react): filtros da busca na URL"
 
 Estilo: objetos de estilo inline (simétrico ao `StyleSheet` do RN e dispensa configurar CSS no Rspack).
 
+> **Revisão de qualidade (aplicada depois):** `RemoteBusca` e `Fronteira` moram em `features/busca/components/` nos dois hosts (feature não importa de `app/`); `role="alert"` no fallback de erro, `aria-hidden` na caixa da inicial, comentário do TS2664 no `remotes.d.ts`, `encodeURIComponent` no id da rota. Os blocos abaixo são a versão original; o código final está no repositório.
+
 - [ ] **Step 1: `rspack.config.mjs`**
 
 ```js
@@ -1759,6 +1761,8 @@ git commit -m "chore(host-rn): projeto RN 0.86.3 com Re.Pack no lugar do Metro"
 ```
 
 ### Task 12: Telas, navegação e fronteira do host-rn
+
+> **Revisão de qualidade (aplicada depois):** `RemoteBusca` e `Fronteira` moram em `features/busca/components/` nos dois hosts (feature não importa de `app/`); `role="alert"` no fallback de erro, `aria-hidden` na caixa da inicial, comentário do TS2664 no `remotes.d.ts`, `encodeURIComponent` no id da rota. Os blocos abaixo são a versão original; o código final está no repositório.
 
 **Files:**
 - Create: `host-rn/src/remotes.d.ts`

@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from 'react-router'
-import { RemoteBusca } from '@/app/layout/RemoteBusca'
+import { RemoteBusca } from '../components/RemoteBusca'
 import { gravarFiltros, lerFiltros } from '../utils/filtrosUrl'
 
 export function PaginaBusca() {
@@ -11,7 +11,7 @@ export function PaginaBusca() {
       // o mini-app só lê isto na montagem; depois ele é dono do estado
       filtrosIniciais={lerFiltros(params)}
       onFiltrosMudaram={(filtros) => setParams(gravarFiltros(filtros), { replace: true })}
-      onSelecionarVeiculo={(veiculo) => navigate(`/veiculo/${veiculo.id}`, { state: { veiculo } })}
+      onSelecionarVeiculo={(veiculo) => navigate(`/veiculo/${encodeURIComponent(veiculo.id)}`, { state: { veiculo } })}
     />
   )
 }

@@ -15,7 +15,7 @@ class LimiteDeErro extends Component<{ children: ReactNode }, { erro: boolean }>
   render() {
     if (!this.state.erro) return this.props.children
     return (
-      <div style={estilos.centro}>
+      <div style={estilos.centro} role="alert">
         <p>Busca indisponível</p>
         {/* ponytail: o runtime do MF guarda a falha do módulo; recarregar é o único retry que funciona */}
         <button type="button" onClick={() => window.location.reload()}>

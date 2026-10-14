@@ -97,22 +97,25 @@ mini-app/src/
 └── index.tsx · bootstrap.tsx
 
 host-react/src/
-├── app/       routes/ · App.tsx · layout/Fronteira.tsx · layout/RemoteBusca.tsx
+├── app/       routes/ · App.tsx · layout/Layout.tsx
 ├── features/
-│   ├── busca/    pages/PaginaBusca.tsx · utils/filtrosUrl.ts (+ teste)
+│   ├── busca/    pages/PaginaBusca.tsx · components/RemoteBusca.tsx · components/Fronteira.tsx
+│   │             utils/filtrosUrl.ts (+ teste)
 │   └── veiculo/  pages/PaginaVeiculo.tsx
 ├── remotes.d.ts
 └── index.tsx · bootstrap.tsx
 
 host-rn/src/
-├── app/       routes/Navegacao.tsx · App.tsx · layout/Fronteira.tsx · layout/RemoteBusca.tsx
+├── app/       routes/Navegacao.tsx · App.tsx
 ├── remotes.d.ts
 └── features/
-    ├── busca/    screens/TelaBusca.tsx
+    ├── busca/    screens/TelaBusca.tsx · components/RemoteBusca.tsx · components/Fronteira.tsx
     └── veiculo/  screens/TelaVeiculo.tsx
 ```
 
 Não existem `shared/`, `api/` nem `state/` (YAGNI). Aliases `@/` nos três.
+`RemoteBusca` e `Fronteira` são da feature `busca` (não de `app/layout`): só ela os usa,
+e feature não importa de `app/` — a dependência vai só de `app` para `features`.
 Estilo: `StyleSheet` do RN no mini-app e no host-rn; objetos de estilo inline no
 host-react (simétrico ao `StyleSheet` e dispensa configurar CSS no Rspack).
 
