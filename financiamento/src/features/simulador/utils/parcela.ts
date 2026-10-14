@@ -6,8 +6,8 @@ export const PRAZO_PADRAO: Prazo = 48
 export const TAXA_MENSAL = 0.0149
 
 /** Tabela Price: parcela fixa, arredondada para centavos. */
-export function calcularParcela(preco: number, entrada: number, prazo: Prazo, taxaMensal = TAXA_MENSAL): number {
+export function calcularParcela(preco: number, entrada: number, prazo: Prazo): number {
   const financiado = preco - entrada
-  const parcela = (financiado * taxaMensal) / (1 - (1 + taxaMensal) ** -prazo)
+  const parcela = (financiado * TAXA_MENSAL) / (1 - (1 + TAXA_MENSAL) ** -prazo)
   return Math.round(parcela * 100) / 100
 }

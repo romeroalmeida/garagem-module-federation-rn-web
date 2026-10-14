@@ -48,4 +48,5 @@ cd host-rn && npx react-native run-ios --simulator "iPhone 17" --no-packager
 - Derrube o servidor do remote e recarregue: o host mostra "Busca indisponível". No app (dev), o
   LogBox abre antes em tela cheia — o Re.Pack reporta a falha do remote como erro fatal; feche-o.
 - Na web, os filtros vão para a URL; no app, a pilha de telas mantém a busca viva.
-- Para parar um servidor: `lsof -ti tcp:<porta> | xargs kill` (nunca na 9000 — é o Docker).
+- Para parar um servidor: `lsof -ti tcp:<porta> -sTCP:LISTEN | xargs kill` — o `-sTCP:LISTEN` é obrigatório: sem ele
+  o `kill` derruba também quem está conectado (Chrome, o app no simulador). Nunca na 9000 (Docker) nem na 3002 (meu-tramite).

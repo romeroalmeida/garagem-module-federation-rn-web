@@ -1,4 +1,5 @@
-// mínimo explícito nos três: só o máximo dá RangeError no Hermes do Android
+// mínimos explícitos: no `reais`, só o máximo (0 < mínimo padrão do BRL) dá RangeError no Hermes do Android;
+// no percentual, fixa as duas casas ("1,50%")
 const moeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',

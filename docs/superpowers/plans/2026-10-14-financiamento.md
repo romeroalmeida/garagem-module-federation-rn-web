@@ -15,7 +15,9 @@
 - Versões **exatas** onde o plano diz (React 19.2.3, RN 0.86.3, Rspack 1.6.0 — 1.6.2+ quebra o MF v2 —, MF enhanced 2.9.2, Re.Pack 5.4.2). Nunca `--force`/`--legacy-peer-deps`; se o install falhar, parar e reportar.
 - Commit por tarefa: `git add` por caminho (nunca `-A`), mensagem em português terminando com linha em branco + `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Nunca `push`. Nunca abrir `.env`.
 - Escapes visíveis em strings/regex (`\u00A0`), nunca caractere invisível.
-- **Servidores do Romero rodando** em 3000, 3001, 8081 e 8082: não matar. 3002 é a API do meu-tramite e 9000 é o MinIO (Docker): **nunca** `kill` nessas portas. Parar só o que você subir, por porta: `lsof -ti tcp:3003 | xargs kill`, `lsof -ti tcp:8083 | xargs kill`.
+- **Servidores do Romero rodando** em 3000, 3001, 8081 e 8082: não matar nem reiniciar (o controller reinicia 3000 e 8081 depois das Tasks 6 e 7 — até lá eles podem mostrar erro de "Can't resolve 'financiamento/Simulador'", é esperado). 3002 é a API do meu-tramite e 9000 é o MinIO (Docker): **nunca** `kill` nessas portas.
+- **Parar servidor só com `-sTCP:LISTEN`:** `lsof -ti tcp:<porta> -sTCP:LISTEN | xargs kill`. Sem o filtro, o `lsof` devolve também quem está *conectado* à porta (o helper de rede do Chrome, o app no simulador) e o `kill` derruba esses processos.
+- Todo `git commit` abaixo leva a linha `Co-Authored-By` (ex.: `git commit -m "…" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`).
 - `curl` não existe neste shell: use `node -e "fetch(...)"`. Processos longos: `nohup … > /tmp/x.log 2>&1 &`.
 
 ---
@@ -275,9 +277,9 @@ export const PRAZO_PADRAO: Prazo = 48
 export const TAXA_MENSAL = 0.0149
 
 /** Tabela Price: parcela fixa, arredondada para centavos. */
-export function calcularParcela(preco: number, entrada: number, prazo: Prazo, taxaMensal = TAXA_MENSAL): number {
+export function calcularParcela(preco: number, entrada: number, prazo: Prazo): number {
   const financiado = preco - entrada
-  const parcela = (financiado * taxaMensal) / (1 - (1 + taxaMensal) ** -prazo)
+  const parcela = (financiado * TAXA_MENSAL) / (1 - (1 + TAXA_MENSAL) ** -prazo)
   return Math.round(parcela * 100) / 100
 }
 ```
@@ -290,6 +292,8 @@ export function limitesEntrada(preco: number): { min: number; max: number } {
   return { min: Math.ceil((preco * 20) / 100), max: Math.floor((preco * 90) / 100) }
 }
 
+/** true = definida e dentro de [min, max]. No ramo false o TS estreita `entrada` para `undefined`,
+ *  mas ela pode ser um número fora do limite — não confie nesse estreitamento. */
 export function entradaValida(entrada: number | undefined, preco: number): entrada is number {
   const { min, max } = limitesEntrada(preco)
   return entrada !== undefined && entrada >= min && entrada <= max
@@ -305,7 +309,8 @@ export function lerNumero(texto: string): number | undefined {
 - [ ] **Step 6: Implementar `utils/formatar.ts`**
 
 ```ts
-// mínimo explícito nos três: só o máximo dá RangeError no Hermes do Android
+// mínimos explícitos: no `reais`, só o máximo (0 < mínimo padrão do BRL) dá RangeError no Hermes do Android;
+// no percentual, fixa as duas casas ("1,50%")
 const moeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -429,9 +434,8 @@ export default function Simulador({ preco, onInteresse }: SimuladorProps) {
 
   return (
     <View style={estilos.caixa}>
-      <Text role="heading" style={estilos.titulo}>
-        Simule o financiamento
-      </Text>
+      {/* sem role="heading": no react-native-web viraria um segundo <h1> na página do host */}
+      <Text style={estilos.titulo}>Simule o financiamento</Text>
 
       <View style={estilos.linha}>
         <Text style={estilos.rotulo}>Preço do carro</Text>
@@ -678,7 +682,7 @@ Se o Chrome não estiver disponível, conferir só o manifesto e o HTML via node
 - [ ] **Step 7: Typecheck, parar o servidor e commitar**
 
 ```bash
-cd financiamento && npx tsc --noEmit && lsof -ti tcp:3003 | xargs kill
+cd financiamento && npx tsc --noEmit && lsof -ti tcp:3003 -sTCP:LISTEN | xargs kill
 cd .. && git add financiamento/src/index.tsx financiamento/src/bootstrap.tsx financiamento/src/app financiamento/rspack.web.config.mjs
 git commit -m "feat(financiamento): build web via Module Federation com página standalone"
 ```
@@ -757,7 +761,7 @@ Expected: `financiamento [ 'Simulador' ]` em `127.0.0.1` (IPv4 — confirma que 
 - [ ] **Step 3: Parar e commitar**
 
 ```bash
-lsof -ti tcp:8083 | xargs kill
+lsof -ti tcp:8083 -sTCP:LISTEN | xargs kill
 git add financiamento/rspack.native.config.mjs
 git commit -m "feat(financiamento): build nativo via Re.Pack"
 ```
@@ -774,7 +778,7 @@ git commit -m "feat(financiamento): build nativo via Re.Pack"
 - Create: `host-react/src/features/veiculo/components/RemoteFinanciamento.tsx`
 - Modify: `host-react/src/features/busca/components/RemoteBusca.tsx`, `host-react/src/features/veiculo/pages/PaginaVeiculo.tsx`, `host-react/src/remotes.d.ts`, `host-react/tsconfig.json`, `host-react/rspack.config.mjs`
 
-- [ ] **Step 1: Mover a Fronteira** — `git mv host-react/src/features/busca/components/Fronteira.tsx host-react/src/shared/components/Fronteira.tsx` e trocar o conteúdo por:
+- [ ] **Step 1: Mover a Fronteira** — `mkdir -p host-react/src/shared/components && git mv host-react/src/features/busca/components/Fronteira.tsx host-react/src/shared/components/Fronteira.tsx` e trocar o conteúdo por:
 
 ```tsx
 import type { CSSProperties, ReactNode } from 'react'
@@ -897,7 +901,7 @@ const estilos = {
 
 - [ ] **Step 5: `features/veiculo/pages/PaginaVeiculo.tsx`** — três mudanças:
 
-1. Imports (topo do arquivo):
+1. **Substituir** as três linhas de import do topo por:
 ```tsx
 import { useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
@@ -941,7 +945,7 @@ declare module 'financiamento/Simulador' {
 }
 ```
 
-`tsconfig.json` — em `paths`, depois de `@busca/tipos`:
+`tsconfig.json` — em `paths`, depois de `@busca/tipos` (que ganha uma vírgula no fim):
 ```json
       "@financiamento/tipos": ["../financiamento/src/features/simulador/types"]
 ```
@@ -957,7 +961,7 @@ declare module 'financiamento/Simulador' {
 - [ ] **Step 7: Conferir**
 
 Run: `cd host-react && npx tsc --noEmit && npx vitest run && npx rspack build && rm -rf dist`
-Expected: sem erros; 4 testes; build ok (remotes por manifesto resolvem em tempo de execução). `grep -rn "busca/components/Fronteira" src` deve sair vazio.
+Expected: sem erros; 4 testes; build ok (remotes por manifesto resolvem em tempo de execução). `grep -rn "'./Fronteira'" src/features` deve sair vazio (ninguém mais importa a Fronteira antiga).
 
 - [ ] **Step 8: Commit**
 
@@ -974,7 +978,7 @@ git commit -m "feat(host-react): detalhe compõe o remote financiamento; Frontei
 - Create: `host-rn/src/features/veiculo/components/RemoteFinanciamento.tsx`
 - Modify: `host-rn/src/features/busca/components/RemoteBusca.tsx`, `host-rn/src/features/veiculo/screens/TelaVeiculo.tsx`, `host-rn/src/remotes.d.ts`, `host-rn/tsconfig.json`, `host-rn/rspack.config.mjs`
 
-- [ ] **Step 1: Mover a Fronteira** — `git mv host-rn/src/features/busca/components/Fronteira.tsx host-rn/src/shared/components/Fronteira.tsx` e trocar o conteúdo por:
+- [ ] **Step 1: Mover a Fronteira** — `mkdir -p host-rn/src/shared/components && git mv host-rn/src/features/busca/components/Fronteira.tsx host-rn/src/shared/components/Fronteira.tsx` e trocar o conteúdo por:
 
 ```tsx
 import type { ReactNode } from 'react'
@@ -1117,7 +1121,7 @@ const estilos = StyleSheet.create({
 
 - [ ] **Step 5: `features/veiculo/screens/TelaVeiculo.tsx`** — quatro mudanças:
 
-1. Imports (topo):
+1. **Substituir** as três linhas de import do topo por:
 ```tsx
 import { useState } from 'react'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -1166,7 +1170,7 @@ declare module 'financiamento/Simulador' {
 }
 ```
 
-`tsconfig.json` — em `paths`:
+`tsconfig.json` — em `paths`, depois de `@busca/tipos` (que ganha uma vírgula no fim):
 ```json
       "@financiamento/tipos": ["../financiamento/src/features/simulador/types"]
 ```
@@ -1182,7 +1186,7 @@ declare module 'financiamento/Simulador' {
 - [ ] **Step 7: Conferir**
 
 Run: `cd host-rn && npx tsc --noEmit && npm run lint`
-Expected: sem erros. `grep -rn "busca/components/Fronteira" src` deve sair vazio.
+Expected: sem erros. `grep -rn "'./Fronteira'" src/features` deve sair vazio (ninguém mais importa a Fronteira antiga).
 
 - [ ] **Step 8: Commit**
 
@@ -1193,12 +1197,14 @@ git commit -m "feat(host-rn): detalhe compõe o remote financiamento; Fronteira 
 
 ### Task 8: Verificação ponta a ponta, README e cofre (controller)
 
-- [ ] **Step 1: Servidores** — a 3000/3001/8081/8082 já estão no ar (do Romero). Subir os dois novos:
+- [ ] **Step 1: Servidores** (controller). Subir os dois novos e **reiniciar** os hosts — `rspack serve` e Re.Pack não releem o config, e o remote novo só entra com reinício:
 ```bash
 cd financiamento && nohup npm run dev:web > /tmp/estudo-mf-fin-web.log 2>&1 &
 cd financiamento && nohup npm run dev:native > /tmp/estudo-mf-fin-native.log 2>&1 &
+lsof -ti tcp:3000 -sTCP:LISTEN | xargs kill; cd host-react && nohup npm run dev > /tmp/estudo-mf-host-react.log 2>&1 &
+lsof -ti tcp:8081 -sTCP:LISTEN | xargs kill; cd host-rn && nohup npm start > /tmp/estudo-mf-host-rn.log 2>&1 &
 ```
-O host-react recarrega o config? **Não** — `rspack serve` não relê o config: reiniciar só o da 3000 (`lsof -ti tcp:3000 | xargs kill` e `cd host-react && nohup npm run dev …`). O host-rn idem na 8081.
+Esperar as quatro portas responderem; recarregar a aba do Chrome e reabrir o app nos simuladores (`xcrun simctl terminate/launch`).
 
 - [ ] **Step 2: Roteiro web (Chrome)** — abrir o Civic: simulador com "48x de R$ 2.647,49"; prazo 12 → "12x de R$ 8.275,38"; entrada fora → mensagem e botão apagado; "Tenho interesse" → "Proposta enviada ✓ — 12x de R$ 8.275,38"; voltar e abrir outro carro → simulador do novo preço, sem proposta; derrubar a 3003 → detalhe e busca funcionando, só "Simulador indisponível"; religar e "Tentar de novo"; console sem "Invalid hook call"/aviso de versão.
 

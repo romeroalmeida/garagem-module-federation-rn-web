@@ -136,7 +136,7 @@ type SimuladorProps = {
   `parcela = financiado × i / (1 − (1 + i)^−n)`, com `i = TAXA_MENSAL = 0.0149` e `n = prazo`;
   resultado arredondado para centavos (`Math.round(x * 100) / 100`).
 - **Prazos:** `PRAZOS = [12, 24, 36, 48, 60]`, `PRAZO_PADRAO = 48`.
-- **Entrada:** `limitesEntrada(preco)` → `{ min: Math.ceil(preco * 0.2), max: Math.floor(preco * 0.9) }`.
+- **Entrada:** `limitesEntrada(preco)` → `{ min: Math.ceil((preco * 20) / 100), max: Math.floor((preco * 90) / 100) }`.
   Estado inicial = `min`. `entradaValida(entrada, preco)` = entrada definida e dentro de
   `[min, max]` (inclusivo).
 - **Valores de referência** (preço R$ 112.900, entrada R$ 22.580, financiado R$ 90.320):
