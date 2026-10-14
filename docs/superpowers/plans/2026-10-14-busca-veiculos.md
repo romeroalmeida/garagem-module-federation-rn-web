@@ -4,7 +4,7 @@
 
 **Goal:** Um mini-app de busca de veículos (código React Native) carregado em tempo de execução, via Module Federation 2.0, por um host React web e por um host React Native.
 
-**Architecture:** Três projetos independentes em `estudo-mf/` (cada um com seu `npm install`). O `mini-app` tem um código e dois builds: web (Rspack + `react-native-web`, porta 3001) e nativo (Re.Pack, porta 9000). `host-react` (Rspack + React Router 7, porta 3000) e `host-rn` (RN CLI 0.86.3 + Re.Pack + React Navigation, porta 8081) importam `busca/BuscaVeiculos` com `React.lazy`. Os hosts só compartilham **tipos** com o mini-app (alias de TS para `types.ts`).
+**Architecture:** Três projetos independentes em `estudo-mf/` (cada um com seu `npm install`). O `mini-app` tem um código e dois builds: web (Rspack + `react-native-web`, porta 3001) e nativo (Re.Pack, porta 8082). `host-react` (Rspack + React Router 7, porta 3000) e `host-rn` (RN CLI 0.86.3 + Re.Pack + React Navigation, porta 8081) importam `busca/BuscaVeiculos` com `React.lazy`. Os hosts só compartilham **tipos** com o mini-app (alias de TS para `types.ts`).
 
 **Tech Stack:** React 19.2.3 · React Native 0.86.3 · react-native-web 0.21.4 · Rspack 1.6.0 · @module-federation/enhanced 2.9.2 · @callstack/repack 5.4.2 · React Router 7 · React Navigation 7 · Vitest 4 · TypeScript 5.9
 
@@ -87,7 +87,7 @@ estudo-mf/
   "version": "0.1.0",
   "scripts": {
     "dev:web": "rspack serve --config rspack.web.config.mjs",
-    "dev:native": "react-native start --config rspack.native.config.mjs --port 9000",
+    "dev:native": "react-native start --config rspack.native.config.mjs --port 8082",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -192,7 +192,7 @@ export type BuscaVeiculosProps = {
 [
   { "id": "1", "marca": "Honda", "modelo": "Civic", "versao": "EXL 2.0", "ano": 2020, "km": 45000, "preco": 112900, "cidade": "Volta Redonda", "uf": "RJ" },
   { "id": "2", "marca": "Honda", "modelo": "City", "versao": "Touring 1.5", "ano": 2022, "km": 28000, "preco": 109900, "cidade": "Barra Mansa", "uf": "RJ" },
-  { "id": "3", "marca": "Honda", "modelo": "HR-V", "versao": "EXL 1.5", "ano": 2021, "km": 39000, "preco": 129900, "cidade": "Resende", "uf": "RJ" },
+  { "id": "3", "marca": "Honda", "modelo": "HR-V", "versao": "EXL 1.5", "ano": 2021, "km": 38082, "preco": 129900, "cidade": "Resende", "uf": "RJ" },
   { "id": "4", "marca": "Honda", "modelo": "Fit", "versao": "EX 1.5", "ano": 2019, "km": 61000, "preco": 79900, "cidade": "Volta Redonda", "uf": "RJ" },
   { "id": "5", "marca": "Toyota", "modelo": "Corolla", "versao": "XEi 2.0", "ano": 2021, "km": 30000, "preco": 128500, "cidade": "Barra Mansa", "uf": "RJ" },
   { "id": "6", "marca": "Toyota", "modelo": "Corolla Cross", "versao": "XRE 2.0", "ano": 2023, "km": 15000, "preco": 159900, "cidade": "Resende", "uf": "RJ" },
@@ -208,16 +208,16 @@ export type BuscaVeiculosProps = {
   { "id": "16", "marca": "Chevrolet", "modelo": "S10", "versao": "LTZ 2.8", "ano": 2019, "km": 112000, "preco": 189900, "cidade": "Valença", "uf": "RJ" },
   { "id": "17", "marca": "Fiat", "modelo": "Argo", "versao": "Drive 1.0", "ano": 2022, "km": 31000, "preco": 74900, "cidade": "Barra Mansa", "uf": "RJ" },
   { "id": "18", "marca": "Fiat", "modelo": "Cronos", "versao": "Precision 1.3", "ano": 2021, "km": 44000, "preco": 82900, "cidade": "Volta Redonda", "uf": "RJ" },
-  { "id": "19", "marca": "Fiat", "modelo": "Pulse", "versao": "Impetus 1.0", "ano": 2023, "km": 9000, "preco": 119900, "cidade": "Porto Real", "uf": "RJ" },
+  { "id": "19", "marca": "Fiat", "modelo": "Pulse", "versao": "Impetus 1.0", "ano": 2023, "km": 8082, "preco": 119900, "cidade": "Porto Real", "uf": "RJ" },
   { "id": "20", "marca": "Fiat", "modelo": "Toro", "versao": "Volcano 2.0", "ano": 2021, "km": 67000, "preco": 149900, "cidade": "Barra do Piraí", "uf": "RJ" },
   { "id": "21", "marca": "Fiat", "modelo": "Mobi", "versao": "Like 1.0", "ano": 2020, "km": 58000, "preco": 49900, "cidade": "Pinheiral", "uf": "RJ" },
   { "id": "22", "marca": "Hyundai", "modelo": "HB20", "versao": "Comfort 1.0", "ano": 2021, "km": 41000, "preco": 69900, "cidade": "Volta Redonda", "uf": "RJ" },
   { "id": "23", "marca": "Hyundai", "modelo": "HB20S", "versao": "Platinum 1.0", "ano": 2023, "km": 14000, "preco": 104900, "cidade": "Resende", "uf": "RJ" },
-  { "id": "24", "marca": "Hyundai", "modelo": "Creta", "versao": "Limited 1.0", "ano": 2022, "km": 29000, "preco": 134900, "cidade": "Barra Mansa", "uf": "RJ" },
+  { "id": "24", "marca": "Hyundai", "modelo": "Creta", "versao": "Limited 1.0", "ano": 2022, "km": 28082, "preco": 134900, "cidade": "Barra Mansa", "uf": "RJ" },
   { "id": "25", "marca": "Jeep", "modelo": "Renegade", "versao": "Longitude 1.3", "ano": 2021, "km": 51000, "preco": 109900, "cidade": "Volta Redonda", "uf": "RJ" },
   { "id": "26", "marca": "Jeep", "modelo": "Compass", "versao": "Limited 1.3", "ano": 2022, "km": 38000, "preco": 164900, "cidade": "Resende", "uf": "RJ" },
   { "id": "27", "marca": "Jeep", "modelo": "Commander", "versao": "Overland 2.0", "ano": 2023, "km": 21000, "preco": 239900, "cidade": "Itatiaia", "uf": "RJ" },
-  { "id": "28", "marca": "Renault", "modelo": "Kwid", "versao": "Zen 1.0", "ano": 2022, "km": 19000, "preco": 54900, "cidade": "Porto Real", "uf": "RJ" },
+  { "id": "28", "marca": "Renault", "modelo": "Kwid", "versao": "Zen 1.0", "ano": 2022, "km": 18082, "preco": 54900, "cidade": "Porto Real", "uf": "RJ" },
   { "id": "29", "marca": "Renault", "modelo": "Duster", "versao": "Iconic 1.3", "ano": 2021, "km": 46000, "preco": 104900, "cidade": "Barra do Piraí", "uf": "RJ" },
   { "id": "30", "marca": "Renault", "modelo": "Sandero", "versao": "Stepway 1.6", "ano": 2020, "km": 63000, "preco": 69900, "cidade": "Valença", "uf": "RJ" }
 ]
@@ -1617,14 +1617,14 @@ export default Repack.defineRspackConfig((env) => {
 
 ```bash
 cd mini-app && nohup npm run dev:native > /tmp/estudo-mf-mini-native.log 2>&1 &
-until node -e "fetch('http://localhost:9000/ios/mf-manifest.json').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; do sleep 3; done
-node -e "fetch('http://localhost:9000/ios/mf-manifest.json').then(r=>r.json()).then(m=>console.log(m.name, m.exposes.map(e=>e.name)))"
+until node -e "fetch('http://localhost:8082/ios/mf-manifest.json').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; do sleep 3; done
+node -e "fetch('http://localhost:8082/ios/mf-manifest.json').then(r=>r.json()).then(m=>console.log(m.name, m.exposes.map(e=>e.name)))"
 ```
 Expected: `busca [ 'BuscaVeiculos' ]` (o primeiro build pode levar um minuto). No CLI 20, os comandos do `react-native.config.js` têm prioridade sobre os do Metro, então `react-native start` roda o Re.Pack.
 
 - [ ] **Step 6: Parar o servidor e commitar**
 
-Run: `lsof -ti tcp:9000 | xargs kill`
+Run: `lsof -ti tcp:8082 | xargs kill`
 
 ```bash
 git add mini-app/babel.config.js mini-app/react-native.config.js mini-app/index.native.js mini-app/rspack.native.config.mjs mini-app/package.json
@@ -1704,7 +1704,7 @@ export default Repack.defineRspackConfig((env) => {
       new Repack.RepackPlugin(),
       new Repack.plugins.ModuleFederationPluginV2({
         name: 'hostRn',
-        remotes: { busca: `busca@http://localhost:9000/${platform}/mf-manifest.json` },
+        remotes: { busca: `busca@http://localhost:8082/${platform}/mf-manifest.json` },
         dts: false,
         // version-first buscaria o manifesto na inicialização e derrubaria o app com o remote fora
         shareStrategy: 'loaded-first',
@@ -1996,7 +1996,7 @@ git commit -m "feat(host-rn): host nativo carregando a busca via Module Federati
 cd mini-app && npm run dev:native > /tmp/estudo-mf-mini-native.log 2>&1
 cd host-rn && npm start > /tmp/estudo-mf-host-rn.log 2>&1
 ```
-Conferir `http://localhost:9000/ios/mf-manifest.json` e `http://localhost:8081` respondendo.
+Conferir `http://localhost:8082/ios/mf-manifest.json` e `http://localhost:8081` respondendo.
 
 - [ ] **Step 2: Build e instalação no simulador**
 
@@ -2009,7 +2009,7 @@ Expected: `BUILD SUCCEEDED` e o app aberto no simulador.
 2. Abrir "Filtros", marcar Honda, "Ver 4 carros" → lista só com Honda; botão "Filtros (1)".
 3. Tocar num carro → tela de detalhe do host. "Voltar para a busca" → mesma lista filtrada.
 4. Desligar o iPhone (`xcrun simctl shutdown <UDID>`; com dois simuladores ligados o `booted` fica ambíguo) e usar o simulador de iPad (`--simulator "iPad Air 11-inch (M3)"` ou o iPad disponível em `xcrun simctl list devices available`) → painel lateral.
-5. Matar o servidor da 9000 (`lsof -ti tcp:9000 | xargs kill`) e reabrir o app (`xcrun simctl terminate <UDID> org.reactjs.native.example.HostRn && xcrun simctl launch <UDID> org.reactjs.native.example.HostRn`) → "Busca indisponível". Um toast vermelho do LogBox ao lado é esperado (o erro é capturado, mas passa pelo `console.error`). Subir a 9000 de novo, esperar responder e tocar "Tentar de novo" → busca volta.
+5. Matar o servidor da 8082 (`lsof -ti tcp:8082 | xargs kill`) e reabrir o app (`xcrun simctl terminate <UDID> org.reactjs.native.example.HostRn && xcrun simctl launch <UDID> org.reactjs.native.example.HostRn`) → "Busca indisponível". Um toast vermelho do LogBox ao lado é esperado (o erro é capturado, mas passa pelo `console.error`). Subir a 8082 de novo, esperar responder e tocar "Tentar de novo" → busca volta.
 6. Teclado virtual ligado (Simulator: ⌘K), abrir "Filtros", tocar em "Preço até": o teclado numérico aparece, dá para rolar o modal até "Ver N carros" (e arrastar o sheet para baixo fecha o modal).
 7. Log do host-rn sem "Invalid hook call" e sem aviso de versão de shared.
 
@@ -2031,7 +2031,7 @@ por um host nativo. Spec: `docs/superpowers/specs/2026-10-14-busca-veiculos-desi
 | Projeto | O que é | Porta |
 |---|---|---|
 | `mini-app` (web) | remote `busca` + página standalone | 3001 |
-| `mini-app` (nativo) | remote `busca` via Re.Pack | 9000 |
+| `mini-app` (nativo) | remote `busca` via Re.Pack | 8082 |
 | `host-react` | host web (Rspack + React Router) | 3000 |
 | `host-rn` | host nativo (RN 0.86 + Re.Pack) | 8081 |
 
@@ -2054,7 +2054,7 @@ cd host-react && npm run dev        # 3000 — o host
 ## Rodar o nativo (3 terminais)
 
 ```bash
-cd mini-app && npm run dev:native   # 9000
+cd mini-app && npm run dev:native   # 8082
 cd host-rn && npm start             # 8081
 cd host-rn && npx react-native run-ios --simulator "iPhone 17" --no-packager
 ```

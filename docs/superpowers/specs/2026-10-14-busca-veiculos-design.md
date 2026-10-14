@@ -24,7 +24,7 @@ Fotos reais, ordenação, paginação, host Next, Android (anotado: `localhost` 
 estudo-mf/                      3 projetos independentes, cada um com seu node_modules
 ├── mini-app/   remote "busca"  um código RN, dois builds
 │   ├── web:    Rspack + react-native-web  → http://localhost:3001/mf-manifest.json
-│   └── nativo: Re.Pack                    → http://localhost:9000/ios/mf-manifest.json
+│   └── nativo: Re.Pack                    → http://localhost:8082/ios/mf-manifest.json
 ├── host-react/ Rspack + React Router      → http://localhost:3000
 └── host-rn/    RN CLI + Re.Pack + React Navigation (native-stack), simulador iOS
                 dev server na 8081
@@ -35,7 +35,7 @@ estudo-mf/                      3 projetos independentes, cada um com seu node_m
   O barrel da feature é o módulo exposto.
 - **Remotes nos hosts:**
   - web: `busca@http://localhost:3001/mf-manifest.json`
-  - nativo: `` `busca@http://localhost:9000/${platform}/mf-manifest.json` ``
+  - nativo: `` `busca@http://localhost:8082/${platform}/mf-manifest.json` ``
 - **Carregamento:** `React.lazy(() => import('busca/BuscaVeiculos'))` criado **no
   escopo do módulo** (não dentro do componente), dentro de `Suspense`. Assim voltar
   do detalhe não pisca "Carregando busca…".
@@ -247,5 +247,5 @@ type BuscaVeiculosProps = {
 |---|---|
 | host-react | 3000 |
 | mini-app web (remote + página standalone) | 3001 |
-| mini-app nativo (Re.Pack dev server) | 9000 |
+| mini-app nativo (Re.Pack dev server) | 8082 — a 9000 é do MinIO do meu-tramite (Docker) |
 | host-rn (Re.Pack dev server) | 8081 |
