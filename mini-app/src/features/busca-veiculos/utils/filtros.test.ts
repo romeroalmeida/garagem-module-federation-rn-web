@@ -44,7 +44,7 @@ describe('chipsAtivos', () => {
   const f = { texto: 'civic', marcas: ['Honda', 'Toyota'], precoMax: 120000, anoMin: 2019, kmMax: 80000, ordem: 'menor-preco' as const }
 
   it('um chip por marca e por limite, sem texto nem ordem', () => {
-    expect(chipsAtivos(f).map((c) => c.rotulo)).toEqual(['Honda', 'Toyota', 'Até R$ 120.000', 'A partir de 2019', 'Até 80.000 km'])
+    expect(chipsAtivos(f).map((c) => c.rotulo)).toEqual(['Honda', 'Toyota', 'Até R$\u00A0120.000', 'A partir de 2019', 'Até 80.000 km'])
   })
 
   it('cada chip sabe os filtros sem ele', () => {
