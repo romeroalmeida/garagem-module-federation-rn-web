@@ -5,8 +5,6 @@ build
 *.log
 # RN nativo
 host-rn/ios/Pods
-host-rn/ios/build
 host-rn/android/.gradle
-host-rn/android/app/build
-host-rn/android/build
-.env
+.env*
+!.env.example

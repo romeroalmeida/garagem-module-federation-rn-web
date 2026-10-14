@@ -107,13 +107,15 @@ host-react/src/
 
 host-rn/src/
 ├── app/       routes/Navegacao.tsx · App.tsx
+├── shared/    types/rotas.ts   ← mapa da pilha (app + as duas features)
 ├── remotes.d.ts
 └── features/
     ├── busca/    screens/TelaBusca.tsx · components/RemoteBusca.tsx · components/Fronteira.tsx
     └── veiculo/  screens/TelaVeiculo.tsx
 ```
 
-Não existem `shared/`, `api/` nem `state/` (YAGNI). Aliases `@/` nos três.
+Só o host-rn tem `shared/types/rotas.ts` (mapa da pilha usado pelo app e pelas duas
+features). Fora isso, sem `shared/`, `api/` ou `state/` (YAGNI). Aliases `@/` nos três.
 `RemoteBusca` e `Fronteira` são da feature `busca` (não de `app/layout`): só ela os usa,
 e feature não importa de `app/` — a dependência vai só de `app` para `features`.
 Estilo: `StyleSheet` do RN no mini-app e no host-rn; objetos de estilo inline no
@@ -179,7 +181,7 @@ type BuscaVeiculosProps = {
 - `PainelFiltros`: checkboxes de marca (`Pressable` com `role="checkbox"` e
   `aria-checked` — funcionam no RN e no react-native-web, onde os props
   `accessibility*` estão depreciados), campos
-  "Preço até", "Ano a partir de", "Km até" (`TextInput keyboardType="numeric"`,
+  "Preço até", "Ano a partir de", "Km até" (`TextInput inputMode="numeric"`,
   caracteres não numéricos descartados, vazio = sem limite) e "Limpar filtros"
   (limpa o painel e preserva o texto da busca).
 - Cabeçalho da lista: "N carros encontrados" (singular para 1).
@@ -187,7 +189,7 @@ type BuscaVeiculosProps = {
   modelo + versão, `ano · km`, preço, `cidade - UF`. Formatação com
   `Intl.NumberFormat('pt-BR')`.
 - Lista vazia: "Nenhum carro com esses filtros" + "Limpar busca e filtros" (zera tudo).
-- Lista com `FlatList`; na web a área tem largura máxima de 1100px.
+- Lista com `FlatList`; a área tem largura máxima de 1100px (centralizada).
 
 **Hosts (web e app iguais):** marca fictícia **Garagem**.
 
@@ -198,7 +200,7 @@ type BuscaVeiculosProps = {
 ## Estado dos filtros nos hosts
 
 - **host-react:** a URL é a fonte. `/busca?q=civic&marcas=Honda,Toyota&precoMax=120000&anoMin=2019&kmMax=80000`.
-  `filtrosUrl.ler(searchParams)` → `Filtros`; `filtrosUrl.gravar(filtros)` →
+  `lerFiltros(searchParams)` → `Filtros`; `gravarFiltros(filtros)` →
   `URLSearchParams` (omite vazios). `onFiltrosMudaram` grava com
   `setSearchParams(…, { replace: true })`. Ao tocar num carro:
   `navigate('/veiculo/' + id, { state: { veiculo } })`. "Voltar" usa
@@ -227,7 +229,7 @@ type BuscaVeiculosProps = {
   plugin de runtime do MF com `errorLoadRemote` que marca o erro como `ChunkLoadError`,
   ou `loadRemote()` no lugar do `import()` — fica como evolução.
 - **Carregando:** fallback do `Suspense` "Carregando busca…".
-- **URL com valor inválido** (`precoMax=abc`, marca inexistente): `filtrosUrl.ler`
+- **URL com valor inválido** (`precoMax=abc`, marca inexistente): `lerFiltros`
   ignora o número inválido; `normalizarFiltros` no mini-app descarta a marca.
 - **Detalhe web aberto sem `state`** (URL `/veiculo/42` colada numa aba nova — F5
   na mesma aba **mantém** o state, porque o React Router o guarda no
@@ -238,7 +240,7 @@ type BuscaVeiculosProps = {
 - **Vitest (unitário):**
   - mini-app: `filtrarVeiculos` (acento/caixa, OU de marcas, E entre filtros,
     limites inclusivos, filtros vazios = tudo), `normalizarFiltros`, `formatar`.
-  - host-react: `filtrosUrl` (ida e volta `ler(gravar(f))` igual a `f`; ignora
+  - host-react: `filtrosUrl` (ida e volta `lerFiltros(gravarFiltros(f))` igual a `f`; ignora
     inválidos; omite vazios).
 - **Sem teste de componente na v1** (custo de configurar Testing Library para web
   e nativo não paga o estudo).

@@ -3,10 +3,11 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from '@rspack/cli'
 import { rspack } from '@rspack/core'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
-import pkg from './package.json' with { type: 'json' }
+import reactPkg from 'react/package.json' with { type: 'json' }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const versaoReact = pkg.dependencies.react
+// versão instalada (exata), não a declarada — um ^ no package.json afrouxaria o requiredVersion
+const versaoReact = reactPkg.version
 
 const HTML = `<!doctype html>
 <html lang="pt-BR">

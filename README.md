@@ -39,7 +39,7 @@ cd host-rn && npx react-native run-ios --simulator "iPhone 17" --no-packager
 ```bash
 (cd mini-app && npm test && npm run typecheck)
 (cd host-react && npm test && npm run typecheck)
-(cd host-rn && npx tsc --noEmit)
+(cd host-rn && npx tsc --noEmit && npm run lint)
 ```
 
 ## O que observar
