@@ -8,7 +8,13 @@ const Stack = createNativeStackNavigator<Rotas>()
 
 export function Navegacao() {
   return (
-    <Stack.Navigator screenOptions={{ headerTitleStyle: { fontFamily: tipo.display.fontFamily, color: cores.ink }, headerShadowVisible: false }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerTitleStyle: { fontFamily: tipo.display.fontFamily, color: cores.ink },
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: cores.surface },
+      }}
+    >
       <Stack.Screen name="Busca" component={TelaBusca} options={{ title: 'GARAGEM · host app' }} />
       <Stack.Screen name="Veiculo" component={TelaVeiculo} options={{ title: 'Detalhe' }} />
     </Stack.Navigator>
