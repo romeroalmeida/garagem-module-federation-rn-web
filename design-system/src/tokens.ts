@@ -33,7 +33,7 @@ const familias = Platform.select({
     bold: 'Figtree-Bold',
   },
 })
-const peso = (fontWeight: '400' | '600' | '700'): TextStyle => (Platform.OS === 'web' ? { fontWeight } : {})
+const peso = (fontWeight: '400' | '600' | '700'): Pick<TextStyle, 'fontWeight'> => (Platform.OS === 'web' ? { fontWeight } : {})
 
 export const tipo = {
   display: { fontFamily: familias.display, textTransform: 'uppercase', letterSpacing: 0.5, color: cores.ink },

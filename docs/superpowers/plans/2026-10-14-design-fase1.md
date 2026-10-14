@@ -497,6 +497,8 @@ export { Titulo } from './componentes/Titulo'
 Expected: `package/package.json`, `package/dist/index.js`, `package/dist/index.d.ts`, `package/dist/componentes/*.js` e `.d.ts`; **sem** `src/`.
 - [ ] **Step 2:** `printf 'dist\n' > design-system/.gitignore` (o `.tgz` é o artefato publicado e vai para o git; o `dist/` não).
 - [ ] **Step 3: Commit** — `git add design-system/.gitignore design-system/garagem-ds-1.0.0.tgz` · `build(ds): pacote 1.0.0`
+
+> **Depois da revisão:** saiu a **1.0.1** (silhuetas de hatch e SUV redesenhadas, contorno nas rodas, Espaço nos chips da web, `Titulo` com `role="heading"` + `aria-level`, Skeleton sem congelar, `peso` com `Pick<TextStyle, 'fontWeight'>`). As tasks seguintes instalam `garagem-ds-1.0.1.tgz`.
 - **Regra para depois:** mudou o DS → subir a versão (1.0.1…), `npm run pacote`, e nos 4 projetos `npm i -E ../design-system/garagem-ds-<versão>.tgz` (caminho explícito) e reiniciar os dev servers. Reempacotar a mesma versão é invisível: `npm install` diz "up to date" e `npm ci` restaura o conteúdo antigo do cache pelo hash do lockfile.
 
 ---
@@ -510,10 +512,10 @@ Expected: `package/package.json`, `package/dist/index.js`, `package/dist/index.d
 - [ ] **Step 1: Dependências**
 
 ```bash
-cd host-rn && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.0.tgz
+cd host-rn && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.1.tgz
 npm ls react react-native react-native-svg lucide-react-native @garagem/ds --depth=0
 ```
-Expected: react 19.2.3, react-native 0.86.3, svg 15.15.5, lucide 1.57.0, `@garagem/ds@1.0.0`.
+Expected: react 19.2.3, react-native 0.86.3, svg 15.15.5, lucide 1.57.0, `@garagem/ds@1.0.1`.
 
 - [ ] **Step 2: Fontes** (Google Fonts / autor da Figtree, licença OFL)
 
@@ -745,7 +747,7 @@ export function chipsAtivos(f: Filtros): ChipAtivo[] {
 
 **Files:** Modify `mini-app/package.json`, `mini-app/rspack.web.config.mjs`, `mini-app/rspack.native.config.mjs`, `components/BarraBusca.tsx`, `components/CardVeiculo.tsx`, `components/PainelFiltros.tsx`, `pages/BuscaVeiculos.tsx`
 
-- [ ] **Step 1: Dependências** — `cd mini-app && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.0.tgz`
+- [ ] **Step 1: Dependências** — `cd mini-app && npm install -E react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.1.tgz`
 
 - [ ] **Step 2: `rspack.web.config.mjs`**
   - imports no topo: `import pkg from './package.json' with { type: 'json' }`, `import dsPkg from '@garagem/ds/package.json' with { type: 'json' }`, `import rnwPkg from 'react-native-web/package.json' with { type: 'json' }`;
@@ -1279,7 +1281,7 @@ const estilos = StyleSheet.create({
 em `gravarFiltros`, antes do `return`: `if (filtros.ordem) params.set('ordem', filtros.ordem)`.
 - [ ] **Step 4:** `npx vitest run` → PASS (5 testes).
 
-- [ ] **Step 5: Dependências** — `cd host-react && npm install -E react-native-web@0.21.4 react-native@0.86.3 react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.0.tgz` (o `react-native` entra fixo para o npm não escolher outra versão ao satisfazer peers; o bundle usa o react-native-web pelo alias).
+- [ ] **Step 5: Dependências** — `cd host-react && npm install -E react-native-web@0.21.4 react-native@0.86.3 react-native-svg@15.15.5 lucide-react-native@1.57.0 ../design-system/garagem-ds-1.0.1.tgz` (o `react-native` entra fixo para o npm não escolher outra versão ao satisfazer peers; o bundle usa o react-native-web pelo alias).
 
 - [ ] **Step 6: `rspack.config.mjs`**
   - imports: `pkg` (já existe), `dsPkg` e `rnwPkg` como na Task 6;

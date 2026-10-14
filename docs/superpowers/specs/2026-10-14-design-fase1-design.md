@@ -86,7 +86,7 @@ design-system/
 | `Card` | `children`, `onPress?` | raio 16, borda `line`, sem sombra; com `onPress` vira `Pressable role="button"` |
 | `Selo` | `texto`, `tom?: 'positivo' \| 'neutro'` | positivo = accentSoft + ink |
 | `Skeleton` | `largura`, `altura`, `raio?` | pulsa (opacidade 0.5↔1, 900ms); parado se `AccessibilityInfo.isReduceMotionEnabled()` / `prefers-reduced-motion` |
-| `Titulo` | `children`, `tamanho?: 'grande' \| 'medio'` | `tipo.display`; grande = 32 / 56 a partir de 1024px, médio = 22; sem `role="heading"` (o RN 0.86 não tipa `aria-level`) |
+| `Titulo` | `children`, `tamanho?: 'grande' \| 'medio'`, `nivel?: 1 \| 2 \| 3` (padrão 2) | `tipo.display`; grande = 32 / 56 a partir de 1024px, médio = 22; `role="heading"` + `aria-level` por spread (o RN 0.86 não tipa `aria-level`; sem ele o RNW gera sempre `<h1>`) |
 | `Icone` | `nome` (subconjunto do Lucide: `Calendar`, `Gauge`, `Cog`, `Fuel`, `MapPin`, `Search`, `SlidersHorizontal`, `X`, `Check`), `tamanho?`, `cor?` | traço 1.75, cor padrão ink |
 | `Silhueta` | `carroceria: 'hatch' \| 'sedan' \| 'suv' \| 'picape'` | ocupa a largura do container; SVG de perfil (viewBox 320×120, corpo + 2 rodas) em `ink` a 85% sobre `carStage`, 4:3 |
 

@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text } from 'react-native'
+import { Platform, Pressable, StyleSheet, Text } from 'react-native'
 import { cores, raios, tipo } from '../tokens'
 import { Icone, type NomeIcone } from './Icone'
 
 type Props = {
   rotulo: string
   onPress: () => void
+  /** só faz sentido com papel checkbox/radio (aí ganha ✓ e aria-checked) */
   selecionado?: boolean
   papel?: 'checkbox' | 'radio' | 'button'
   /** mostra × e anuncia "Remover {rotulo}" */
@@ -16,8 +17,21 @@ type Props = {
 export function Chip({ rotulo, onPress, selecionado = false, papel = 'button', removivel, icone }: Props) {
   const corConteudo = selecionado ? cores.bg : cores.ink
   const marcavel = papel !== 'button'
+  // no react-native-web, Espaço só ativa role button/menuitem; checkbox e radio precisam responder a ele
+  const teclado =
+    Platform.OS === 'web' && marcavel
+      ? {
+          onKeyDown: (e: { key: string; preventDefault(): void }) => {
+            if (e.key === ' ') {
+              e.preventDefault()
+              onPress()
+            }
+          },
+        }
+      : {}
   return (
     <Pressable
+      {...teclado}
       role={papel}
       aria-checked={marcavel ? selecionado : undefined}
       aria-label={removivel ? `Remover ${rotulo}` : undefined}

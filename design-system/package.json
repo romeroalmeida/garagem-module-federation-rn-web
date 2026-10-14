@@ -1,6 +1,6 @@
 {
   "name": "@garagem/ds",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Design system do estudo-mf: tokens e componentes base em React Native (web via react-native-web)",
   "main": "dist/index.js",
