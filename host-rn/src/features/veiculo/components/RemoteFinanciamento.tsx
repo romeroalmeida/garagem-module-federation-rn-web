@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { Skeleton } from '@garagem/ds'
 import type { SimuladorProps } from '@financiamento/tipos'
 import { Fronteira } from '@/shared/components/Fronteira'
 import { LimiteDeErro } from '@/shared/components/LimiteDeErro'
@@ -16,7 +17,13 @@ export function RemoteFinanciamento(props: SimuladorProps) {
   return (
     <Fronteira nome="financiamento">
       <LimiteDeErro mensagem="Simulador indisponível">
-        <Suspense fallback={<Text style={estilos.carregando}>Carregando simulador…</Text>}>
+        <Suspense
+          fallback={
+            <View style={estilos.carregando}>
+              <Skeleton largura="100%" altura={460} raio={16} />
+            </View>
+          }
+        >
           <Simulador {...props} />
         </Suspense>
       </LimiteDeErro>
@@ -25,5 +32,5 @@ export function RemoteFinanciamento(props: SimuladorProps) {
 }
 
 const estilos = StyleSheet.create({
-  carregando: { padding: 32, textAlign: 'center' },
+  carregando: { padding: 8 },
 })

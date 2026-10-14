@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { Skeleton } from '@garagem/ds'
 import type { BuscaVeiculosProps } from '@busca/tipos'
 import { Fronteira } from '@/shared/components/Fronteira'
 import { LimiteDeErro } from '@/shared/components/LimiteDeErro'
@@ -19,7 +20,15 @@ export function RemoteBusca(props: BuscaVeiculosProps) {
   return (
     <Fronteira nome="busca" preencher>
       <LimiteDeErro mensagem="Busca indisponível">
-        <Suspense fallback={<Text style={estilos.carregando}>Carregando busca…</Text>}>
+        <Suspense
+          fallback={
+            <View style={estilos.carregando}>
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} largura="100%" altura={300} raio={16} />
+              ))}
+            </View>
+          }
+        >
           <BuscaVeiculos {...props} />
         </Suspense>
       </LimiteDeErro>
@@ -28,5 +37,5 @@ export function RemoteBusca(props: BuscaVeiculosProps) {
 }
 
 const estilos = StyleSheet.create({
-  carregando: { padding: 32, textAlign: 'center' },
+  carregando: { gap: 16, padding: 16 },
 })
