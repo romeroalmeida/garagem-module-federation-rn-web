@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url'
 import * as Repack from '@callstack/repack'
 import reactPkg from 'react/package.json' with { type: 'json' }
 import reactNativePkg from 'react-native/package.json' with { type: 'json' }
+import pkg from './package.json' with { type: 'json' }
+import dsPkg from '@garagem/ds/package.json' with { type: 'json' }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -44,6 +46,13 @@ export default Repack.defineRspackConfig((env) => {
             eager: false,
             version: reactNativePkg.version,
             requiredVersion: reactNativePkg.version,
+          },
+          '@garagem/ds': { singleton: true, eager: false, version: dsPkg.version, requiredVersion: '^1.0.0' },
+          'react-native-svg': {
+            singleton: true,
+            eager: false,
+            version: pkg.dependencies['react-native-svg'],
+            requiredVersion: pkg.dependencies['react-native-svg'],
           },
         },
       }),

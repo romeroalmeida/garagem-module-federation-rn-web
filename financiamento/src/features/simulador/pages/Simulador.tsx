@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { SeletorPrazo } from '../components/SeletorPrazo'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { Botao, Chip, Titulo, cores, raios, tipo } from '@garagem/ds'
 import type { Prazo, Simulacao, SimuladorProps } from '../types'
-import { entradaValida, lerNumero, limitesEntrada } from '../utils/entrada'
+import { entradaPorPercentual, entradaValida, lerNumero, limitesEntrada } from '../utils/entrada'
 import { formatarMoeda, formatarReais, formatarTaxa } from '../utils/formatar'
-import { PRAZO_PADRAO, TAXA_MENSAL, calcularParcela } from '../utils/parcela'
+import { PRAZOS, PRAZO_PADRAO, TAXA_MENSAL, calcularParcela } from '../utils/parcela'
+
+const PERCENTUAIS = [20, 30, 40, 50] as const
 
 export default function Simulador({ preco, onInteresse }: SimuladorProps) {
   const limites = limitesEntrada(preco)
@@ -18,89 +20,75 @@ export default function Simulador({ preco, onInteresse }: SimuladorProps) {
 
   return (
     <View style={estilos.caixa}>
-      {/* sem role="heading": o RN 0.86 não tipa aria-level, e sem ele o react-native-web gera um segundo <h1> */}
-      <Text style={estilos.titulo}>Simule o financiamento</Text>
+      <Titulo>Simule o financiamento</Titulo>
 
       <View style={estilos.linha}>
-        <Text style={estilos.rotulo}>Preço do carro</Text>
-        <Text style={estilos.valor}>{formatarReais(preco)}</Text>
+        <Text style={tipo.corpo}>Preço do carro</Text>
+        <Text style={tipo.corpoForte}>{formatarReais(preco)}</Text>
       </View>
 
-      <View style={estilos.linha}>
-        <Text style={estilos.rotulo}>Entrada</Text>
-        <TextInput
-          value={entrada === undefined ? '' : String(entrada)}
-          onChangeText={(texto) => setEntrada(lerNumero(texto))}
-          inputMode="numeric"
-          maxLength={9}
-          aria-label="Entrada"
-          style={estilos.input}
-        />
+      <Text style={tipo.corpoForte}>Entrada</Text>
+      <View role="radiogroup" aria-label="Entrada em percentual do preço" style={estilos.chips}>
+        {PERCENTUAIS.map((percentual) => {
+          const valor = entradaPorPercentual(preco, percentual)
+          return <Chip key={percentual} papel="radio" rotulo={`${percentual}%`} selecionado={entrada === valor} onPress={() => setEntrada(valor)} />
+        })}
       </View>
-      <Text style={estilos.ajuda}>mín. 20% do preço</Text>
+      <TextInput
+        value={entrada === undefined ? '' : String(entrada)}
+        onChangeText={(texto) => setEntrada(lerNumero(texto))}
+        inputMode="numeric"
+        maxLength={9}
+        aria-label="Entrada"
+        style={[tipo.corpo, estilos.input]}
+      />
+      <Text style={tipo.legenda}>
+        mín. {formatarReais(limites.min)} · máx. {formatarReais(limites.max)}
+      </Text>
 
-      <Text style={estilos.rotulo}>Prazo (meses)</Text>
-      <SeletorPrazo valor={prazo} onChange={setPrazo} />
+      <Text style={tipo.corpoForte}>Prazo (meses)</Text>
+      <View role="radiogroup" aria-label="Prazo em meses" style={estilos.chips}>
+        {PRAZOS.map((p) => (
+          <Chip key={p} papel="radio" rotulo={String(p)} selecionado={p === prazo} onPress={() => setPrazo(p)} />
+        ))}
+      </View>
 
       {/* região viva sempre montada: anuncia a parcela nova (ou os limites) sem interromper.
-          No iOS o VoiceOver não lê região viva — lacuna conhecida. */}
-      <View aria-live="polite">
+          No iOS o VoiceOver não lê região viva — lacuna conhecida. Accent só sobre escuro (10,4:1). */}
+      <View aria-live="polite" style={estilos.resultado}>
         {simulacao ? (
-          <View style={estilos.resultado}>
+          <>
             <Text style={estilos.parcela}>
               {prazo}x de {formatarMoeda(simulacao.parcela)}
             </Text>
-            <Text style={estilos.ajuda}>taxa {formatarTaxa(TAXA_MENSAL)} · simulação, sem valor de proposta</Text>
-          </View>
+            <Text style={estilos.taxa}>taxa {formatarTaxa(TAXA_MENSAL)} · simulação, sem valor de proposta</Text>
+          </>
         ) : (
-          <Text style={estilos.erro}>
+          <Text style={estilos.taxa}>
             Entrada entre {formatarReais(limites.min)} e {formatarReais(limites.max)}
           </Text>
         )}
       </View>
 
-      {/* avisa o host só no clique — nunca num efeito; `disabled` já expõe aria-disabled nas duas plataformas */}
-      <Pressable
-        role="button"
-        disabled={!simulacao}
-        onPress={() => simulacao && onInteresse?.(simulacao)}
-        style={[estilos.botao, !simulacao && estilos.botaoBloqueado]}
-      >
-        <Text style={estilos.botaoTexto}>Tenho interesse</Text>
-      </Pressable>
+      {/* avisa o host só no clique — nunca num efeito */}
+      <Botao rotulo="Tenho interesse" desabilitado={!simulacao} onPress={() => simulacao && onInteresse?.(simulacao)} />
     </View>
   )
 }
 
 const estilos = StyleSheet.create({
-  caixa: { gap: 10, padding: 16, borderRadius: 8, borderWidth: 1, borderColor: '#e4e4e7', backgroundColor: '#fff' },
-  titulo: { fontSize: 18, fontWeight: '700', color: '#18181b' },
+  caixa: { gap: 12, padding: 16, borderRadius: raios.card, borderWidth: 1, borderColor: cores.line, backgroundColor: cores.bg },
   linha: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  rotulo: { fontSize: 14, fontWeight: '600', color: '#3f3f46' },
-  valor: { fontSize: 16, fontWeight: '700', color: '#18181b' },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   input: {
-    minWidth: 140,
+    minHeight: 48,
+    paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#d4d4d8',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 16,
-    textAlign: 'right',
-    backgroundColor: '#fff',
+    borderColor: cores.inkSoft,
+    borderRadius: raios.botao,
+    backgroundColor: cores.bg,
   },
-  ajuda: { fontSize: 12, color: '#71717a' },
-  resultado: { gap: 2, marginTop: 6 },
-  parcela: { fontSize: 22, fontWeight: '700', color: '#18181b' },
-  erro: { marginTop: 6, fontSize: 14, color: '#b91c1c' },
-  botao: {
-    minHeight: 44,
-    marginTop: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#7c3aed',
-  },
-  botaoBloqueado: { opacity: 0.4 },
-  botaoTexto: { fontSize: 15, fontWeight: '700', color: '#fff' },
+  resultado: { gap: 4, padding: 16, borderRadius: raios.card, backgroundColor: cores.ink },
+  parcela: { ...tipo.preco, fontSize: 26, color: cores.accent },
+  taxa: { ...tipo.legenda, color: cores.bg },
 })

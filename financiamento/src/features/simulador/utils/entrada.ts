@@ -15,3 +15,8 @@ export function lerNumero(texto: string): number | undefined {
   const digitos = texto.replace(/\D/g, '')
   return digitos === '' ? undefined : Number(digitos)
 }
+
+/** Atalho dos chips de entrada (20%, 30%…): mesmo arredondamento do mínimo. */
+export function entradaPorPercentual(preco: number, percentual: number): number {
+  return Math.ceil((preco * percentual) / 100)
+}

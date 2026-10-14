@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { entradaValida, lerNumero, limitesEntrada } from './entrada'
+import { entradaPorPercentual, entradaValida, lerNumero, limitesEntrada } from './entrada'
 
 describe('limitesEntrada', () => {
   it('20% e 90% do preço, em reais inteiros', () => {
@@ -26,5 +26,13 @@ describe('lerNumero', () => {
     expect(lerNumero('30.000')).toBe(30000)
     expect(lerNumero('abc')).toBeUndefined()
     expect(lerNumero('')).toBeUndefined()
+  })
+})
+
+describe('entradaPorPercentual', () => {
+  it('arredonda para cima em reais inteiros; 20% coincide com o mínimo', () => {
+    expect(entradaPorPercentual(112900, 20)).toBe(limitesEntrada(112900).min)
+    expect(entradaPorPercentual(112900, 30)).toBe(33870)
+    expect(entradaPorPercentual(99999, 50)).toBe(50000)
   })
 })
