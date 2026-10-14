@@ -54,10 +54,13 @@ const estilos = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 14,
     borderRadius: raios.pilula,
-    // preenchido em vez de contorno: o texto identifica o controle (WCAG 1.4.11 não exige borda)
-    backgroundColor: cores.surface,
+    // branco com borda sutil: aparece tanto sobre o fundo surface da página quanto sobre painéis brancos
+    // (o texto identifica o controle; a borda é decorativa, WCAG 1.4.11 não a exige)
+    borderWidth: 1,
+    borderColor: cores.line,
+    backgroundColor: cores.bg,
   },
-  selecionado: { backgroundColor: cores.ink },
+  selecionado: { backgroundColor: cores.ink, borderColor: cores.ink },
   pressionado: { opacity: 0.8 },
   texto: { fontSize: 14 },
 })
