@@ -28,6 +28,8 @@ export default Repack.defineRspackConfig((env) => {
           use: { loader: '@callstack/repack/babel-swc-loader', parallel: true, options: {} },
           type: 'javascript/auto',
         },
+        // ponytail: inline = fotos em base64 dentro do bundle do remote (~4 MB), teto aceito;
+        // upgrade: assets remotos do Re.Pack (getAssetTransformRules({ remote: { publicPath } })) ou CDN
         ...Repack.getAssetTransformRules({ inline: true }),
       ],
     },

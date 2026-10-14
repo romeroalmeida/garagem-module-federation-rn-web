@@ -55,6 +55,8 @@ export default defineConfig({
         },
         type: 'javascript/auto',
       },
+      // fotos como arquivo separado; com publicPath 'auto' a URL é absoluta ao remote (funciona dentro do host)
+      { test: /\.(png|jpe?g|webp)$/i, type: 'asset/resource' },
     ],
   },
   plugins: [
