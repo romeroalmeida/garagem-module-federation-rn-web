@@ -208,3 +208,21 @@ Contrato não muda. Visual com o DS:
 4. Remote `financiamento`: visual.
 5. Hosts: shared/config, header, skeletons, anúncio.
 6. Verificação, README, cofre.
+
+## Fase 1.1 — acabamento (14/10/2026, depois do feedback "cara de wireframe")
+
+- **Fotos reais** do Wikimedia Commons (licenças CC0, CC BY, CC BY-SA), uma por anúncio, 800×600
+  JPEG ≤ 120 KB em `mini-app/src/features/busca-veiculos/services/fotos/` + `creditos.json`
+  (autor, licença, URLs). O HB20S (23) usa a foto 16:9 sobre fundo desfocado dela mesma (sem esticar).
+  Imagens geradas por IA ficaram de fora: a conta do Higgsfield está sem créditos e comprar é do Romero.
+- **Contrato** (só acréscimos): `Veiculo.cor: Cor`, `Veiculo.foto?: FonteImagem`,
+  `Veiculo.creditoFoto?: { autor, licenca, licencaUrl, fonte }`.
+- **Entrega das fotos:** import estático no mini-app. Web: `asset/resource` (arquivo separado, URL
+  absoluta pelo `publicPath: 'auto'` do remote). Nativo: `inline` do Re.Pack (base64 no bundle do
+  remote, ~4 MB) — teto conhecido; caminho de upgrade: assets remotos do Re.Pack ou CDN.
+- **DS 1.1.0:** `sombras` (card/elevada via `boxShadow`), display com peso 400 explícito, `Card`
+  branco com sombra e +2px no hover (web), `Chip` preenchido (`surface`), `Campo` (texto preenchido),
+  `FotoCarro` (foto 4:3 + crédito por cima; sem foto, a `Silhueta`).
+- **Telas:** fundo da página em `surface` com cards brancos; busca em pílula branca com sombra;
+  selo "Elétrico"/"Diesel" sobre a foto do card; anúncio com foto + crédito com link (autor,
+  licença, Wikimedia), spec "Cor" e blocos em cards brancos; simulador em card branco com sombra.

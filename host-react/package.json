@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@garagem/ds": "file:../design-system/garagem-ds-1.0.2.tgz",
+    "@garagem/ds": "file:../design-system/garagem-ds-1.1.0.tgz",
     "lucide-react-native": "1.57.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",

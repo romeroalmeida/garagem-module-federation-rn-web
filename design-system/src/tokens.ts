@@ -15,6 +15,12 @@ export const cores = {
 } as const
 
 export const raios = { pilula: 100, card: 16, botao: 12 } as const
+
+// sombras suaves; boxShadow funciona no RN 0.76+ (nova arquitetura) e no react-native-web
+export const sombras = {
+  card: '0 1px 2px rgba(23, 23, 23, 0.06), 0 8px 24px rgba(23, 23, 23, 0.08)',
+  elevada: '0 2px 4px rgba(23, 23, 23, 0.08), 0 16px 32px rgba(23, 23, 23, 0.14)',
+} as const
 export const espaco = (n: number) => n * 8
 export const CONTAINER = 1200
 
@@ -36,7 +42,8 @@ const familias = Platform.select({
 const peso = (fontWeight: '400' | '600' | '700'): Pick<TextStyle, 'fontWeight'> => (Platform.OS === 'web' ? { fontWeight } : {})
 
 export const tipo = {
-  display: { fontFamily: familias.display, textTransform: 'uppercase', letterSpacing: 0.5, color: cores.ink },
+  // 400 explícito: a Archivo Black só tem esse peso (sem isso, um <h1> na web vira negrito falso)
+  display: { fontFamily: familias.display, ...peso('400'), textTransform: 'uppercase', letterSpacing: 0.5, color: cores.ink },
   titulo: { fontFamily: familias.bold, ...peso('700'), fontSize: 20, color: cores.ink },
   corpo: { fontFamily: familias.regular, ...peso('400'), fontSize: 16, color: cores.ink },
   corpoForte: { fontFamily: familias.semibold, ...peso('600'), fontSize: 16, color: cores.ink },
