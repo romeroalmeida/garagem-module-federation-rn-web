@@ -1,17 +1,20 @@
 import { useMemo, useState } from 'react'
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
+import { FlatList, Modal, ScrollView, StyleSheet, Text, View, useWindowDimensions, type DimensionValue } from 'react-native'
+import { Botao, Chip, cores, tipo } from '@garagem/ds'
 import { BarraBusca } from '../components/BarraBusca'
 import { CardVeiculo } from '../components/CardVeiculo'
 import { PainelFiltros } from '../components/PainelFiltros'
 import { listarMarcas, listarVeiculos } from '../services/veiculosService'
 import type { BuscaVeiculosProps, Filtros } from '../types'
 import { filtrarVeiculos } from '../utils/filtrarVeiculos'
-import { FILTROS_VAZIOS, contarFiltrosAtivos, normalizarFiltros } from '../utils/filtros'
+import { FILTROS_VAZIOS, chipsAtivos, contarFiltrosAtivos, normalizarFiltros } from '../utils/filtros'
 import { formatarResultado, formatarVerCarros } from '../utils/formatar'
+import { ROTULOS_ORDEM, ordenarVeiculos } from '../utils/ordenar'
 
 const LARGURA_PAINEL_LATERAL = 768
 const veiculos = listarVeiculos()
 const marcas = listarMarcas()
+const colunasPara = (largura: number) => (largura >= 1100 ? 3 : largura >= LARGURA_PAINEL_LATERAL ? 2 : 1)
 
 export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSelecionarVeiculo }: BuscaVeiculosProps) {
   // filtrosIniciais é lido só na montagem; depois o estado é do mini-app
@@ -21,8 +24,13 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
   const largo = width >= LARGURA_PAINEL_LATERAL
   // ao virar largo (redimensionar/girar), o modal fecha — senão reabre sozinho ao voltar a estreito
   if (largo && modalAberto) setModalAberto(false)
-  const resultado = useMemo(() => filtrarVeiculos(veiculos, filtros), [filtros])
+  const colunas = colunasPara(width)
+  const resultado = useMemo(() => ordenarVeiculos(filtrarVeiculos(veiculos, filtros), filtros.ordem), [filtros])
   const ativos = contarFiltrosAtivos(filtros)
+  const chips = chipsAtivos(filtros)
+  const contador =
+    formatarResultado(resultado.length) +
+    (filtros.ordem && filtros.ordem !== 'relevancia' ? ` · ordenados por ${ROTULOS_ORDEM[filtros.ordem].toLowerCase()}` : '')
 
   // Avisa o host aqui, no handler — nunca num useEffect (loop com setSearchParams do host)
   function atualizar(novos: Filtros) {
@@ -31,6 +39,7 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
   }
 
   const painel = <PainelFiltros marcas={marcas} filtros={filtros} onChange={atualizar} />
+  const larguraCelula = `${100 / colunas}%` as DimensionValue
 
   return (
     <View style={estilos.raiz}>
@@ -43,24 +52,36 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
       <View style={estilos.conteudo}>
         <BarraBusca valor={filtros.texto} onChange={(texto) => atualizar({ ...filtros, texto })} />
 
-        {!largo && (
-          <Pressable role="button" style={estilos.botaoFiltros} onPress={() => setModalAberto(true)}>
-            <Text style={estilos.botaoFiltrosTexto}>{ativos > 0 ? `Filtros (${ativos})` : 'Filtros'}</Text>
-          </Pressable>
+        {(!largo || chips.length > 0) && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={estilos.chips}>
+            {!largo && (
+              <Chip icone="SlidersHorizontal" rotulo={ativos > 0 ? `Filtros (${ativos})` : 'Filtros'} onPress={() => setModalAberto(true)} />
+            )}
+            {chips.map((chip) => (
+              <Chip key={chip.id} rotulo={chip.rotulo} removivel onPress={() => atualizar(chip.sem)} />
+            ))}
+            {chips.length > 0 && (
+              <Chip rotulo="Limpar" onPress={() => atualizar({ ...FILTROS_VAZIOS, texto: filtros.texto, ordem: filtros.ordem })} />
+            )}
+          </ScrollView>
         )}
 
-        <Text style={estilos.contador}>{formatarResultado(resultado.length)}</Text>
+        <Text style={tipo.legenda}>{contador}</Text>
 
         <FlatList
+          key={`colunas-${colunas}`}
+          numColumns={colunas}
           data={resultado}
           keyExtractor={(v) => v.id}
-          renderItem={({ item }) => <CardVeiculo veiculo={item} onPress={() => onSelecionarVeiculo(item)} />}
+          renderItem={({ item }) => (
+            <View style={[estilos.celula, { width: larguraCelula }]}>
+              <CardVeiculo veiculo={item} onPress={() => onSelecionarVeiculo(item)} />
+            </View>
+          )}
           ListEmptyComponent={
             <View style={estilos.vazio}>
-              <Text style={estilos.vazioTexto}>Nenhum carro com esses filtros</Text>
-              <Pressable role="button" style={estilos.botaoPrimario} onPress={() => atualizar(FILTROS_VAZIOS)}>
-                <Text style={estilos.botaoPrimarioTexto}>Limpar busca e filtros</Text>
-              </Pressable>
+              <Text style={tipo.corpo}>Nenhum carro com esses filtros</Text>
+              <Botao rotulo="Limpar busca e filtros" onPress={() => atualizar(FILTROS_VAZIOS)} />
             </View>
           }
           contentContainerStyle={estilos.lista}
@@ -83,9 +104,7 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
           automaticallyAdjustKeyboardInsets
         >
           {painel}
-          <Pressable role="button" style={estilos.botaoPrimario} onPress={() => setModalAberto(false)}>
-            <Text style={estilos.botaoPrimarioTexto}>{formatarVerCarros(resultado.length)}</Text>
-          </Pressable>
+          <Botao rotulo={formatarVerCarros(resultado.length)} onPress={() => setModalAberto(false)} />
         </ScrollView>
       </Modal>
     </View>
@@ -93,38 +112,14 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
 }
 
 const estilos = StyleSheet.create({
-  raiz: {
-    flex: 1,
-    flexDirection: 'row',
-    width: '100%',
-    maxWidth: 1100,
-    alignSelf: 'center',
-    backgroundColor: '#f4f4f5',
-  },
-  lateral: { width: 240, flexGrow: 0, flexShrink: 0, borderRightWidth: 1, borderRightColor: '#e4e4e7' },
+  raiz: { flex: 1, flexDirection: 'row', width: '100%', maxWidth: 1200, alignSelf: 'center', backgroundColor: cores.bg },
+  lateral: { width: 280, flexGrow: 0, flexShrink: 0, borderRightWidth: 1, borderRightColor: cores.line },
   lateralConteudo: { padding: 16 },
-  conteudo: { flex: 1, padding: 16, gap: 10 },
-  botaoFiltros: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#7c3aed',
-  },
-  botaoFiltrosTexto: { color: '#7c3aed', fontWeight: '600' },
-  contador: { fontSize: 13, color: '#52525b' },
+  conteudo: { flex: 1, padding: 16, gap: 12 },
+  chips: { gap: 8, alignItems: 'center' },
   lista: { paddingBottom: 24 },
+  celula: { padding: 6 },
   vazio: { alignItems: 'center', gap: 12, paddingVertical: 40 },
-  vazioTexto: { fontSize: 15, color: '#52525b' },
-  modal: { flex: 1, backgroundColor: '#f4f4f5' },
+  modal: { flex: 1, backgroundColor: cores.bg },
   modalConteudo: { padding: 20, gap: 16 },
-  botaoPrimario: {
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#7c3aed',
-  },
-  botaoPrimarioTexto: { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

@@ -1,61 +1,48 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { Card, Icone, Silhueta, cores, tipo, type NomeIcone } from '@garagem/ds'
 import type { Veiculo } from '../types'
-import { formatarKm, formatarPreco } from '../utils/formatar'
+import { ROTULO_CAMBIO, ROTULO_COMBUSTIVEL, formatarKm, formatarPreco } from '../utils/formatar'
 
 type Props = { veiculo: Veiculo; onPress: () => void }
 
 export function CardVeiculo({ veiculo, onPress }: Props) {
+  const rotulo = `${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${formatarPreco(veiculo.preco)}`
   return (
-    <Pressable
-      role="button"
-      aria-label={`${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${formatarPreco(veiculo.preco)}`}
-      onPress={onPress}
-      style={({ pressed }) => [estilos.card, pressed && estilos.pressionado]}
-    >
-      {/* ponytail: sem fotos na v1 — caixa com a inicial da marca */}
-      <View style={estilos.foto}>
-        <Text style={estilos.inicial}>{veiculo.marca[0]}</Text>
+    <Card onPress={onPress} rotulo={rotulo}>
+      <Silhueta carroceria={veiculo.carroceria} />
+      <View style={estilos.corpo}>
+        <Text style={[tipo.corpoForte, estilos.nome]} numberOfLines={1}>
+          {veiculo.marca} {veiculo.modelo}
+        </Text>
+        <Text style={tipo.legenda} numberOfLines={1}>
+          {veiculo.versao}
+        </Text>
+        <View style={estilos.specs}>
+          <Spec icone="Calendar" texto={String(veiculo.ano)} />
+          <Spec icone="Gauge" texto={formatarKm(veiculo.km)} />
+          <Spec icone="Cog" texto={ROTULO_CAMBIO[veiculo.cambio]} />
+          <Spec icone="Fuel" texto={ROTULO_COMBUSTIVEL[veiculo.combustivel]} />
+        </View>
+        <Spec icone="MapPin" texto={`${veiculo.cidade} (${veiculo.uf})`} />
+        <Text style={[tipo.preco, estilos.preco]}>{formatarPreco(veiculo.preco)}</Text>
       </View>
-      <View style={estilos.info}>
-        <Text style={estilos.nome}>
-          {veiculo.marca} {veiculo.modelo} <Text style={estilos.versao}>{veiculo.versao}</Text>
-        </Text>
-        <Text style={estilos.detalhe}>
-          {veiculo.ano} · {formatarKm(veiculo.km)}
-        </Text>
-        <Text style={estilos.preco}>{formatarPreco(veiculo.preco)}</Text>
-        <Text style={estilos.detalhe}>
-          {veiculo.cidade} - {veiculo.uf}
-        </Text>
-      </View>
-    </Pressable>
+    </Card>
+  )
+}
+
+function Spec({ icone, texto }: { icone: NomeIcone; texto: string }) {
+  return (
+    <View style={estilos.spec}>
+      <Icone nome={icone} tamanho={14} cor={cores.inkSoft} />
+      <Text style={tipo.legenda}>{texto}</Text>
+    </View>
   )
 }
 
 const estilos = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    gap: 12,
-    padding: 12,
-    marginBottom: 8,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e4e4e7',
-  },
-  pressionado: { opacity: 0.7 },
-  foto: {
-    width: 96,
-    height: 72,
-    borderRadius: 6,
-    backgroundColor: '#e4e4e7',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inicial: { fontSize: 28, fontWeight: '700', color: '#71717a' },
-  info: { flex: 1, gap: 2 },
-  nome: { fontSize: 16, fontWeight: '600', color: '#18181b' },
-  versao: { fontWeight: '400', color: '#52525b' },
-  detalhe: { fontSize: 13, color: '#71717a' },
-  preco: { fontSize: 17, fontWeight: '700', color: '#18181b' },
+  corpo: { gap: 6, padding: 16 },
+  nome: { textTransform: 'uppercase' },
+  specs: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4 },
+  spec: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  preco: { marginTop: 4 },
 })

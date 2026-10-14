@@ -1,6 +1,9 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import type { ReactNode } from 'react'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { Botao, Chip, Titulo, cores, raios, tipo } from '@garagem/ds'
 import type { Filtros } from '../types'
 import { FILTROS_VAZIOS, lerNumero } from '../utils/filtros'
+import { ORDENS, ROTULOS_ORDEM } from '../utils/ordenar'
 
 type Props = { marcas: string[]; filtros: Filtros; onChange: (filtros: Filtros) => void }
 
@@ -8,40 +11,51 @@ export function PainelFiltros({ marcas, filtros, onChange }: Props) {
   const alternarMarca = (marca: string) =>
     onChange({
       ...filtros,
-      marcas: filtros.marcas.includes(marca)
-        ? filtros.marcas.filter((m) => m !== marca)
-        : [...filtros.marcas, marca],
+      marcas: filtros.marcas.includes(marca) ? filtros.marcas.filter((m) => m !== marca) : [...filtros.marcas, marca],
     })
+  const ordemAtual = filtros.ordem ?? 'relevancia'
 
   return (
     <View style={estilos.painel}>
-      <Text style={estilos.titulo}>Marca</Text>
-      {marcas.map((marca) => {
-        const marcada = filtros.marcas.includes(marca)
-        return (
-          <Pressable
-            key={marca}
-            role="checkbox"
-            aria-checked={marcada}
-            onPress={() => alternarMarca(marca)}
-            style={estilos.opcao}
-          >
-            <View style={[estilos.caixa, marcada && estilos.caixaMarcada]}>
-              {marcada && <Text style={estilos.check}>✓</Text>}
-            </View>
-            <Text style={estilos.opcaoTexto}>{marca}</Text>
-          </Pressable>
-        )
-      })}
+      <Titulo>Filtros</Titulo>
+
+      <Secao titulo="Marca">
+        <View role="group" aria-label="Marca" style={estilos.chips}>
+          {marcas.map((marca) => (
+            <Chip key={marca} papel="checkbox" rotulo={marca} selecionado={filtros.marcas.includes(marca)} onPress={() => alternarMarca(marca)} />
+          ))}
+        </View>
+      </Secao>
 
       <CampoNumero rotulo="Preço até (R$)" valor={filtros.precoMax} onChange={(precoMax) => onChange({ ...filtros, precoMax })} />
       <CampoNumero rotulo="Ano a partir de" valor={filtros.anoMin} onChange={(anoMin) => onChange({ ...filtros, anoMin })} />
       <CampoNumero rotulo="Km até" valor={filtros.kmMax} onChange={(kmMax) => onChange({ ...filtros, kmMax })} />
 
-      {/* Limpa o painel e preserva o texto da barra de busca */}
-      <Pressable role="button" style={estilos.limpar} onPress={() => onChange({ ...FILTROS_VAZIOS, texto: filtros.texto })}>
-        <Text style={estilos.link}>Limpar filtros</Text>
-      </Pressable>
+      <Secao titulo="Ordenar por">
+        <View role="radiogroup" aria-label="Ordenar por" style={estilos.chips}>
+          {ORDENS.map((ordem) => (
+            <Chip
+              key={ordem}
+              papel="radio"
+              rotulo={ROTULOS_ORDEM[ordem]}
+              selecionado={ordemAtual === ordem}
+              onPress={() => onChange({ ...filtros, ordem: ordem === 'relevancia' ? undefined : ordem })}
+            />
+          ))}
+        </View>
+      </Secao>
+
+      {/* limpa os filtros do painel; o texto da busca e a ordem ficam */}
+      <Botao variante="contorno" rotulo="Limpar filtros" onPress={() => onChange({ ...FILTROS_VAZIOS, texto: filtros.texto, ordem: filtros.ordem })} />
+    </View>
+  )
+}
+
+function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
+  return (
+    <View style={estilos.secao}>
+      <Text style={tipo.corpoForte}>{titulo}</Text>
+      {children}
     </View>
   )
 }
@@ -50,46 +64,29 @@ type CampoNumeroProps = { rotulo: string; valor?: number; onChange: (valor: numb
 
 function CampoNumero({ rotulo, valor, onChange }: CampoNumeroProps) {
   return (
-    <View style={estilos.campo}>
-      <Text style={estilos.titulo}>{rotulo}</Text>
+    <Secao titulo={rotulo}>
       <TextInput
         value={valor === undefined ? '' : String(valor)}
         onChangeText={(texto) => onChange(lerNumero(texto))}
         inputMode="numeric"
         maxLength={9}
         aria-label={rotulo}
-        style={estilos.input}
+        style={[tipo.corpo, estilos.input]}
       />
-    </View>
+    </Secao>
   )
 }
 
 const estilos = StyleSheet.create({
-  painel: { gap: 6 },
-  titulo: { fontSize: 13, fontWeight: '600', color: '#3f3f46', marginTop: 8 },
-  opcao: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 },
-  caixa: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#a1a1aa',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  caixaMarcada: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
-  check: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  opcaoTexto: { fontSize: 15, color: '#18181b' },
-  campo: { gap: 4 },
+  painel: { gap: 20 },
+  secao: { gap: 8 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   input: {
+    minHeight: 48,
+    paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#d4d4d8',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 15,
-    backgroundColor: '#fff',
+    borderColor: cores.inkSoft,
+    borderRadius: raios.botao,
+    backgroundColor: cores.bg,
   },
-  limpar: { alignSelf: 'flex-start', marginTop: 12 },
-  link: { color: '#7c3aed', fontWeight: '600' },
 })
