@@ -954,7 +954,8 @@ export default defineConfig({
     ],
   },
   plugins: [
-    new rspack.HtmlRspackPlugin({ templateContent: HTML }),
+    // chunks: ['main'] — sem isso a página standalone também injeta o remoteEntry.js
+    new rspack.HtmlRspackPlugin({ templateContent: HTML, chunks: ['main'] }),
     new ModuleFederationPlugin({
       name: 'busca',
       filename: 'remoteEntry.js',
@@ -977,9 +978,10 @@ export default defineConfig({
 
 - [ ] **Step 5: Subir o dev server em background**
 
-Run (background): `cd mini-app && npm run dev:web > /tmp/estudo-mf-mini-web.log 2>&1`
-Esperar: `until curl -s localhost:3001/mf-manifest.json > /dev/null; do sleep 2; done` (timeout 120s). Se `curl` não existir, use `node -e "fetch('http://localhost:3001/mf-manifest.json').then(r=>r.text()).then(console.log)"`.
-Expected: o JSON do manifesto contém `"name":"busca"` e um expose `BuscaVeiculos`. Conferir o header: `node -e "fetch('http://localhost:3001/mf-manifest.json').then(r=>console.log(r.headers.get('access-control-allow-origin')))"` → `*`.
+Run: `cd mini-app && nohup npm run dev:web > /tmp/estudo-mf-mini-web.log 2>&1 &`
+Esperar: `until node -e "fetch('http://localhost:3001/mf-manifest.json').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; do sleep 2; done` (timeout 120s).
+Conferir: `node -e "fetch('http://localhost:3001/mf-manifest.json').then(r=>{console.log(r.headers.get('access-control-allow-origin'));return r.json()}).then(m=>console.log(m.name, m.exposes.map(e=>e.name)))"`
+Expected: `*` e depois `busca [ 'BuscaVeiculos' ]`. Um aviso do plugin de manifesto sobre `publicPath='auto'` no log é normal.
 
 - [ ] **Step 6: Verificar a página standalone no navegador**
 
@@ -990,7 +992,9 @@ Abrir `http://localhost:3001` (Chrome via ferramentas `mcp__claude-in-chrome__*`
 - Console: `[busca] filtros` a cada mudança; sem erro de "Invalid hook call" nem "Shared module".
 Tirar um screenshot de cada layout.
 
-- [ ] **Step 7: Parar o dev server** (matar o processo da 3001) e commitar
+- [ ] **Step 7: Typecheck, parar o dev server e commitar**
+
+Run: `cd mini-app && npx tsc --noEmit && lsof -ti tcp:3001 | xargs kill`
 
 ```bash
 git add mini-app/src/index.tsx mini-app/src/bootstrap.tsx mini-app/src/app mini-app/rspack.web.config.mjs

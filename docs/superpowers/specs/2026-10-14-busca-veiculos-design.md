@@ -154,8 +154,8 @@ type BuscaVeiculosProps = {
 ## Dados e regra de filtro
 
 - `veiculos.json`: 30 carros fictícios de 8 marcas, cidades do Sul Fluminense.
-  `veiculosService.listar()` devolve o array; a lista de marcas do filtro é
-  derivada dele (ordenada, sem repetição).
+  `listarVeiculos()` devolve o array; `listarMarcas()` deriva a lista de marcas do
+  filtro (ordenada, sem repetição). Os dois vêm de `services/veiculosService.ts`.
 - `filtrarVeiculos(veiculos, filtros)` — função pura:
   - texto: ignora acento e caixa, procura em `marca modelo versao`; vazio = sem filtro.
   - marcas: OU entre as marcadas; vazio = todas.
