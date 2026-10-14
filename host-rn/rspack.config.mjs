@@ -4,6 +4,8 @@ import * as Repack from '@callstack/repack'
 import { rspack } from '@rspack/core'
 import reactPkg from 'react/package.json' with { type: 'json' }
 import reactNativePkg from 'react-native/package.json' with { type: 'json' }
+import pkg from './package.json' with { type: 'json' }
+import dsPkg from '@garagem/ds/package.json' with { type: 'json' }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -48,6 +50,15 @@ export default Repack.defineRspackConfig((env) => {
             eager: true,
             version: reactNativePkg.version,
             requiredVersion: reactNativePkg.version,
+          },
+          // design system e svg: uma cópia só em tempo de execução (a do host). Lucide fica fora do shared:
+          // shared não sofre tree-shaking (725 KiB), e só o DS o importa
+          '@garagem/ds': { singleton: true, eager: true, version: dsPkg.version, requiredVersion: '^1.0.0' },
+          'react-native-svg': {
+            singleton: true,
+            eager: true,
+            version: pkg.dependencies['react-native-svg'],
+            requiredVersion: pkg.dependencies['react-native-svg'],
           },
         },
       }),
