@@ -23,4 +23,11 @@ describe('filtrosUrl', () => {
     expect(f.anoMin).toBeUndefined()
     expect(f.kmMax).toBe(50000)
   })
+
+  it('ordem vai e volta pela URL; valor desconhecido é repassado ao mini-app', () => {
+    const f: Filtros = { texto: '', marcas: [], ordem: 'menor-preco' }
+    expect(gravarFiltros(f).toString()).toBe('ordem=menor-preco')
+    expect(lerFiltros(gravarFiltros(f))).toEqual(f)
+    expect(lerFiltros(new URLSearchParams('ordem=xyz')).ordem).toBe('xyz')
+  })
 })

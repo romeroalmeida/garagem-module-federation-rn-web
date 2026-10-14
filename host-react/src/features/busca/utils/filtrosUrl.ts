@@ -14,6 +14,8 @@ export function lerFiltros(params: URLSearchParams): Filtros {
     precoMax: numero(params.get('precoMax')),
     anoMin: numero(params.get('anoMin')),
     kmMax: numero(params.get('kmMax')),
+    // o host não valida a ordem: repassa, e o mini-app descarta o que não conhece
+    ordem: (params.get('ordem') ?? undefined) as Filtros['ordem'],
   }
 }
 
@@ -25,5 +27,6 @@ export function gravarFiltros(filtros: Filtros): URLSearchParams {
   if (filtros.precoMax !== undefined) params.set('precoMax', String(filtros.precoMax))
   if (filtros.anoMin !== undefined) params.set('anoMin', String(filtros.anoMin))
   if (filtros.kmMax !== undefined) params.set('kmMax', String(filtros.kmMax))
+  if (filtros.ordem) params.set('ordem', filtros.ordem)
   return params
 }

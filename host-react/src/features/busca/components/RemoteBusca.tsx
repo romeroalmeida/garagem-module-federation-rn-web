@@ -1,5 +1,6 @@
 import { Suspense, lazy, type CSSProperties } from 'react'
 import type { BuscaVeiculosProps } from '@busca/tipos'
+import { Skeleton } from '@garagem/ds'
 import { Fronteira } from '@/shared/components/Fronteira'
 import { LimiteDeErro } from '@/shared/components/LimiteDeErro'
 
@@ -10,7 +11,7 @@ export function RemoteBusca(props: BuscaVeiculosProps) {
   return (
     <Fronteira nome="busca">
       <LimiteDeErro mensagem="Busca indisponível">
-        <Suspense fallback={<p style={estilos.centro}>Carregando busca…</p>}>
+        <Suspense fallback={<CarregandoBusca />}>
           <BuscaVeiculos {...props} />
         </Suspense>
       </LimiteDeErro>
@@ -18,6 +19,16 @@ export function RemoteBusca(props: BuscaVeiculosProps) {
   )
 }
 
+function CarregandoBusca() {
+  return (
+    <div style={estilos.carregando} aria-busy="true" aria-label="Carregando busca">
+      {[0, 1, 2].map((i) => (
+        <Skeleton key={i} largura="100%" altura={300} raio={16} />
+      ))}
+    </div>
+  )
+}
+
 const estilos = {
-  centro: { padding: 32, textAlign: 'center' },
+  carregando: { display: 'grid', gap: 16, padding: 16 },
 } satisfies Record<string, CSSProperties>

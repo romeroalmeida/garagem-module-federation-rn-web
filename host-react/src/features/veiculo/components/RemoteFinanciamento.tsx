@@ -1,5 +1,6 @@
 import { Suspense, lazy, type CSSProperties } from 'react'
 import type { SimuladorProps } from '@financiamento/tipos'
+import { Skeleton } from '@garagem/ds'
 import { Fronteira } from '@/shared/components/Fronteira'
 import { LimiteDeErro } from '@/shared/components/LimiteDeErro'
 
@@ -10,7 +11,13 @@ export function RemoteFinanciamento(props: SimuladorProps) {
   return (
     <Fronteira nome="financiamento">
       <LimiteDeErro mensagem="Simulador indisponível">
-        <Suspense fallback={<p style={estilos.centro}>Carregando simulador…</p>}>
+        <Suspense
+          fallback={
+            <div style={estilos.carregando} aria-busy="true" aria-label="Carregando simulador">
+              <Skeleton largura="100%" altura={460} raio={16} />
+            </div>
+          }
+        >
           <Simulador {...props} />
         </Suspense>
       </LimiteDeErro>
@@ -19,5 +26,5 @@ export function RemoteFinanciamento(props: SimuladorProps) {
 }
 
 const estilos = {
-  centro: { padding: 32, textAlign: 'center' },
+  carregando: { padding: 8 },
 } satisfies Record<string, CSSProperties>
