@@ -1,7 +1,7 @@
 import type { Filtros, Veiculo } from '../types'
 
 const normalizar = (s: string) =>
-  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
 export function filtrarVeiculos(veiculos: Veiculo[], filtros: Filtros): Veiculo[] {
   const termo = normalizar(filtros.texto.trim())

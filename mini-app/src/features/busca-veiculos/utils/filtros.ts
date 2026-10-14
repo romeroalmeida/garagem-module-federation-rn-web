@@ -9,7 +9,7 @@ const limite = (n: number | undefined) =>
 export function normalizarFiltros(filtros: Filtros | undefined, marcasExistentes: string[]): Filtros {
   if (!filtros) return FILTROS_VAZIOS
   return {
-    texto: filtros.texto ?? '',
+    texto: filtros.texto,
     marcas: filtros.marcas.filter((m) => marcasExistentes.includes(m)),
     precoMax: limite(filtros.precoMax),
     anoMin: limite(filtros.anoMin),

@@ -1,6 +1,7 @@
 const moeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
+  // mínimo explícito: só o máximo dá RangeError no Hermes do Android
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 })

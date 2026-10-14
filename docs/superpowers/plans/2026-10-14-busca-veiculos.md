@@ -319,7 +319,7 @@ Expected: FAIL — `Failed to resolve import "./filtrarVeiculos"` (ou equivalent
 import type { Filtros, Veiculo } from '../types'
 
 const normalizar = (s: string) =>
-  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
 export function filtrarVeiculos(veiculos: Veiculo[], filtros: Filtros): Veiculo[] {
   const termo = normalizar(filtros.texto.trim())
@@ -399,7 +399,7 @@ import { formatarKm, formatarPreco, formatarResultado, formatarVerCarros } from 
 
 describe('formatar', () => {
   it('preço em reais sem centavos', () => {
-    expect(formatarPreco(112900)).toBe('R$ 112.900')
+    expect(formatarPreco(112900)).toBe('R$\u00A0112.900')
   })
 
   it('km com separador de milhar', () => {
@@ -434,7 +434,7 @@ const limite = (n: number | undefined) =>
 export function normalizarFiltros(filtros: Filtros | undefined, marcasExistentes: string[]): Filtros {
   if (!filtros) return FILTROS_VAZIOS
   return {
-    texto: filtros.texto ?? '',
+    texto: filtros.texto,
     marcas: filtros.marcas.filter((m) => marcasExistentes.includes(m)),
     precoMax: limite(filtros.precoMax),
     anoMin: limite(filtros.anoMin),
@@ -460,6 +460,7 @@ export function lerNumero(texto: string): number | undefined {
 const moeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
+  // mínimo explícito: só o máximo dá RangeError no Hermes do Android
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 })
