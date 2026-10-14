@@ -8,7 +8,7 @@ export function CardVeiculo({ veiculo, onPress }: Props) {
   return (
     <Pressable
       role="button"
-      aria-label={`${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${formatarPreco(veiculo.preco)}`}
+      aria-label={`${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${formatarPreco(veiculo.preco)}`}
       onPress={onPress}
       style={({ pressed }) => [estilos.card, pressed && estilos.pressionado]}
     >

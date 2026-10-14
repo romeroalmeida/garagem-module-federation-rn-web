@@ -39,7 +39,7 @@ export function PainelFiltros({ marcas, filtros, onChange }: Props) {
       <CampoNumero rotulo="Km até" valor={filtros.kmMax} onChange={(kmMax) => onChange({ ...filtros, kmMax })} />
 
       {/* Limpa o painel e preserva o texto da barra de busca */}
-      <Pressable role="button" onPress={() => onChange({ ...FILTROS_VAZIOS, texto: filtros.texto })}>
+      <Pressable role="button" style={estilos.limpar} onPress={() => onChange({ ...FILTROS_VAZIOS, texto: filtros.texto })}>
         <Text style={estilos.link}>Limpar filtros</Text>
       </Pressable>
     </View>
@@ -55,8 +55,8 @@ function CampoNumero({ rotulo, valor, onChange }: CampoNumeroProps) {
       <TextInput
         value={valor === undefined ? '' : String(valor)}
         onChangeText={(texto) => onChange(lerNumero(texto))}
-        keyboardType="numeric"
         inputMode="numeric"
+        maxLength={9}
         aria-label={rotulo}
         style={estilos.input}
       />
@@ -90,5 +90,6 @@ const estilos = StyleSheet.create({
     fontSize: 15,
     backgroundColor: '#fff',
   },
-  link: { color: '#7c3aed', fontWeight: '600', marginTop: 12 },
+  limpar: { alignSelf: 'flex-start', marginTop: 12 },
+  link: { color: '#7c3aed', fontWeight: '600' },
 })

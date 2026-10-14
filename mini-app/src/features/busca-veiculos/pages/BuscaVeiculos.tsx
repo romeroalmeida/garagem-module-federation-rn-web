@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FlatList, Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
+import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
 import { BarraBusca } from '../components/BarraBusca'
 import { CardVeiculo } from '../components/CardVeiculo'
 import { PainelFiltros } from '../components/PainelFiltros'
@@ -19,6 +19,8 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
   const [modalAberto, setModalAberto] = useState(false)
   const { width } = useWindowDimensions()
   const largo = width >= LARGURA_PAINEL_LATERAL
+  // ao virar largo (redimensionar/girar), o modal fecha — senão reabre sozinho ao voltar a estreito
+  if (largo && modalAberto) setModalAberto(false)
   const resultado = useMemo(() => filtrarVeiculos(veiculos, filtros), [filtros])
   const ativos = contarFiltrosAtivos(filtros)
 
@@ -32,7 +34,11 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
 
   return (
     <View style={estilos.raiz}>
-      {largo && <View style={estilos.lateral}>{painel}</View>}
+      {largo && (
+        <ScrollView style={estilos.lateral} contentContainerStyle={estilos.lateralConteudo} keyboardShouldPersistTaps="handled">
+          {painel}
+        </ScrollView>
+      )}
 
       <View style={estilos.conteudo}>
         <BarraBusca valor={filtros.texto} onChange={(texto) => atualizar({ ...filtros, texto })} />
@@ -62,17 +68,25 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
       </View>
 
       <Modal
-        visible={!largo && modalAberto}
+        visible={modalAberto}
         animationType="slide"
         presentationStyle="pageSheet"
+        allowSwipeDismissal
         onRequestClose={() => setModalAberto(false)}
       >
-        <View style={estilos.modal}>
+        {/* rola e solta o teclado: o teclado numérico do iPhone não tem tecla de retorno */}
+        <ScrollView
+          style={estilos.modal}
+          contentContainerStyle={estilos.modalConteudo}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          automaticallyAdjustKeyboardInsets
+        >
           {painel}
           <Pressable role="button" style={estilos.botaoPrimario} onPress={() => setModalAberto(false)}>
             <Text style={estilos.botaoPrimarioTexto}>{formatarVerCarros(resultado.length)}</Text>
           </Pressable>
-        </View>
+        </ScrollView>
       </Modal>
     </View>
   )
@@ -87,7 +101,8 @@ const estilos = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#f4f4f5',
   },
-  lateral: { width: 240, padding: 16, borderRightWidth: 1, borderRightColor: '#e4e4e7' },
+  lateral: { width: 240, flexGrow: 0, flexShrink: 0, borderRightWidth: 1, borderRightColor: '#e4e4e7' },
+  lateralConteudo: { padding: 16 },
   conteudo: { flex: 1, padding: 16, gap: 10 },
   botaoFiltros: {
     alignSelf: 'flex-start',
@@ -102,7 +117,8 @@ const estilos = StyleSheet.create({
   lista: { paddingBottom: 24 },
   vazio: { alignItems: 'center', gap: 12, paddingVertical: 40 },
   vazioTexto: { fontSize: 15, color: '#52525b' },
-  modal: { flex: 1, padding: 20, gap: 16, backgroundColor: '#f4f4f5' },
+  modal: { flex: 1, backgroundColor: '#f4f4f5' },
+  modalConteudo: { padding: 20, gap: 16 },
   botaoPrimario: {
     alignItems: 'center',
     paddingHorizontal: 16,
