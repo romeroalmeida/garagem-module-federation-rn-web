@@ -2,7 +2,9 @@
 
 Dois micro-frontends (código React Native) — a **busca** e o **simulador de financiamento**, de "times"
 diferentes — carregados em tempo de execução por um host web e por um host nativo. Os remotes não se
-conhecem: o host faz a ponte (busca → detalhe do carro → simulador). Specs: `docs/superpowers/specs/` (busca, financiamento).
+conhecem: o host faz a ponte (busca → detalhe do carro → simulador). O visual vem de um design system
+versionado, `@garagem/ds` (`design-system/`), compartilhado como singleton pelo Module Federation.
+Specs: `docs/superpowers/specs/` (busca, financiamento, design Fase 1).
 
 | Projeto | O que é | Porta |
 |---|---|---|
@@ -12,11 +14,13 @@ conhecem: o host faz a ponte (busca → detalhe do carro → simulador). Specs: 
 | `financiamento` (nativo) | remote `financiamento` via Re.Pack | 8083 |
 | `host-react` | host web (Rspack + React Router) | 3000 |
 | `host-rn` | host nativo (RN 0.86 + Re.Pack) | 8081 |
+| `design-system` | pacote `@garagem/ds` (tokens + componentes RN) | — |
 
 ## Instalar (uma vez)
 
 ```bash
 nvm use
+# o tarball do design system já está commitado (design-system/garagem-ds-<versão>.tgz)
 (cd mini-app && npm install)
 (cd financiamento && npm install)
 (cd host-react && npm install)
@@ -39,6 +43,22 @@ cd financiamento && npm run dev:native # 8083
 cd host-rn && npm start             # 8081
 cd host-rn && npx react-native run-ios --simulator "iPhone 17" --no-packager
 ```
+
+## Mudar o design system
+
+1. Editar `design-system/src/`, subir a versão em `design-system/package.json` (1.1.1 → 1.1.2…).
+2. `cd design-system && npm install && npm run pacote` (gera `garagem-ds-<versão>.tgz`).
+3. Nos 4 projetos: `npm i -E ../design-system/garagem-ds-<versão>.tgz` (**caminho explícito**) e reiniciar os
+   dev servers. Reempacotar a mesma versão é invisível para o npm ("up to date").
+
+Em tempo de execução vale a cópia do **host** (singleton): atualizar o host já muda o visual dos remotes
+compatíveis (`^1.x`).
+
+## Fotos
+
+As fotos dos anúncios são do Wikimedia Commons (CC0, CC BY, CC BY-SA), com autor, licença e link em
+`mini-app/src/features/busca-veiculos/services/fotos/creditos.json`; o crédito aparece no card e, com
+links, na página do anúncio.
 
 ## Testes
 
