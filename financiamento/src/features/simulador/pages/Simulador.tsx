@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SeletorPrazo } from '../components/SeletorPrazo'
-import type { Prazo, SimuladorProps } from '../types'
+import type { Prazo, Simulacao, SimuladorProps } from '../types'
 import { entradaValida, lerNumero, limitesEntrada } from '../utils/entrada'
 import { formatarMoeda, formatarReais, formatarTaxa } from '../utils/formatar'
 import { PRAZO_PADRAO, TAXA_MENSAL, calcularParcela } from '../utils/parcela'
@@ -11,18 +11,14 @@ export default function Simulador({ preco, onInteresse }: SimuladorProps) {
   // estado inicial vem do preço; trocar de carro remonta o simulador (o host passa key={veiculo.id})
   const [entrada, setEntrada] = useState<number | undefined>(limites.min)
   const [prazo, setPrazo] = useState<Prazo>(PRAZO_PADRAO)
-  const parcela = entradaValida(entrada, preco) ? calcularParcela(preco, entrada, prazo) : undefined
-  const bloqueado = parcela === undefined
-
-  // avisa o host só no clique — nunca num efeito
-  function interesse() {
-    if (parcela === undefined || entrada === undefined) return
-    onInteresse?.({ preco, entrada, prazo, parcela, taxaMensal: TAXA_MENSAL })
-  }
+  // undefined = entrada fora dos limites
+  const simulacao: Simulacao | undefined = entradaValida(entrada, preco)
+    ? { preco, entrada, prazo, parcela: calcularParcela(preco, entrada, prazo), taxaMensal: TAXA_MENSAL }
+    : undefined
 
   return (
     <View style={estilos.caixa}>
-      {/* sem role="heading": no react-native-web viraria um segundo <h1> na página do host */}
+      {/* sem role="heading": o RN 0.86 não tipa aria-level, e sem ele o react-native-web gera um segundo <h1> */}
       <Text style={estilos.titulo}>Simule o financiamento</Text>
 
       <View style={estilos.linha}>
@@ -46,25 +42,29 @@ export default function Simulador({ preco, onInteresse }: SimuladorProps) {
       <Text style={estilos.rotulo}>Prazo (meses)</Text>
       <SeletorPrazo valor={prazo} onChange={setPrazo} />
 
-      {parcela !== undefined ? (
-        <View style={estilos.resultado}>
-          <Text style={estilos.parcela}>
-            {prazo}x de {formatarMoeda(parcela)}
+      {/* região viva sempre montada: anuncia a parcela nova (ou os limites) sem interromper.
+          No iOS o VoiceOver não lê região viva — lacuna conhecida. */}
+      <View aria-live="polite">
+        {simulacao ? (
+          <View style={estilos.resultado}>
+            <Text style={estilos.parcela}>
+              {prazo}x de {formatarMoeda(simulacao.parcela)}
+            </Text>
+            <Text style={estilos.ajuda}>taxa {formatarTaxa(TAXA_MENSAL)} · simulação, sem valor de proposta</Text>
+          </View>
+        ) : (
+          <Text style={estilos.erro}>
+            Entrada entre {formatarReais(limites.min)} e {formatarReais(limites.max)}
           </Text>
-          <Text style={estilos.ajuda}>taxa {formatarTaxa(TAXA_MENSAL)} · simulação, sem valor de proposta</Text>
-        </View>
-      ) : (
-        <Text role="alert" style={estilos.erro}>
-          Entrada entre {formatarReais(limites.min)} e {formatarReais(limites.max)}
-        </Text>
-      )}
+        )}
+      </View>
 
+      {/* avisa o host só no clique — nunca num efeito; `disabled` já expõe aria-disabled nas duas plataformas */}
       <Pressable
         role="button"
-        disabled={bloqueado}
-        aria-disabled={bloqueado}
-        onPress={interesse}
-        style={[estilos.botao, bloqueado && estilos.botaoBloqueado]}
+        disabled={!simulacao}
+        onPress={() => simulacao && onInteresse?.(simulacao)}
+        style={[estilos.botao, !simulacao && estilos.botaoBloqueado]}
       >
         <Text style={estilos.botaoTexto}>Tenho interesse</Text>
       </Pressable>
