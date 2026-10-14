@@ -1,12 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import type { Veiculo } from '@busca/tipos'
+import type { Rotas } from '@/shared/types/rotas'
 import { TelaBusca } from '@/features/busca/screens/TelaBusca'
 import { TelaVeiculo } from '@/features/veiculo/screens/TelaVeiculo'
-
-export type Rotas = {
-  Busca: undefined
-  Veiculo: { veiculo: Veiculo }
-}
 
 const Stack = createNativeStackNavigator<Rotas>()
 

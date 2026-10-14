@@ -217,6 +217,15 @@ type BuscaVeiculosProps = {
   módulo por uma que lança o erro e guarda isso no cache. Então "Tentar de novo"
   recarrega o app inteiro: `window.location.reload()` na web,
   `DevSettings.reload()` no nativo (o estudo só roda em modo dev).
+- **Nativo é diferente (achado na implementação):** o Re.Pack troca o
+  `__webpack_require__` pelo `guardedRequire`, que reporta a falha do remote como erro
+  **fatal** (`ErrorUtils.reportFatalError`) e devolve `undefined`; o `import()` resolve
+  `{ default: undefined }` em vez de rejeitar. No dev o LogBox abre em tela cheia — ao
+  fechar, aparece "Busca indisponível". No release o app fecharia (fora do escopo: o
+  estudo só roda em dev). O `RemoteBusca` do host-rn checa `m.default` e lança um erro
+  claro para o boundary. Para o nativo falhar como a web, sem fatal, o caminho é um
+  plugin de runtime do MF com `errorLoadRemote` que marca o erro como `ChunkLoadError`,
+  ou `loadRemote()` no lugar do `import()` — fica como evolução.
 - **Carregando:** fallback do `Suspense` "Carregando busca…".
 - **URL com valor inválido** (`precoMax=abc`, marca inexistente): `filtrosUrl.ler`
   ignora o número inválido; `normalizarFiltros` no mini-app descarta a marca.

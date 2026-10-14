@@ -2009,7 +2009,7 @@ Expected: `BUILD SUCCEEDED` e o app aberto no simulador.
 2. Abrir "Filtros", marcar Honda, "Ver 4 carros" → lista só com Honda; botão "Filtros (1)".
 3. Tocar num carro → tela de detalhe do host. "Voltar para a busca" → mesma lista filtrada.
 4. Desligar o iPhone (`xcrun simctl shutdown <UDID>`; com dois simuladores ligados o `booted` fica ambíguo) e usar o simulador de iPad (`--simulator "iPad Air 11-inch (M3)"` ou o iPad disponível em `xcrun simctl list devices available`) → painel lateral.
-5. Matar o servidor da 8082 (`lsof -ti tcp:8082 | xargs kill`) e reabrir o app (`xcrun simctl terminate <UDID> org.reactjs.native.example.HostRn && xcrun simctl launch <UDID> org.reactjs.native.example.HostRn`) → "Busca indisponível". Um toast vermelho do LogBox ao lado é esperado (o erro é capturado, mas passa pelo `console.error`). Subir a 8082 de novo, esperar responder e tocar "Tentar de novo" → busca volta.
+5. Matar o servidor da 8082 (`lsof -ti tcp:8082 | xargs kill`) e reabrir o app (`xcrun simctl terminate <UDID> org.reactjs.native.example.HostRn && xcrun simctl launch <UDID> org.reactjs.native.example.HostRn`) → "Busca indisponível". No dev, o LogBox abre em **tela cheia** com o erro fatal do Re.Pack (`RUNTIME-003 … while loading "./BuscaVeiculos"`): é esperado (ver spec, "Erros"); fechar com "Dismiss" mostra "Busca indisponível". Subir a 8082 de novo, esperar responder e tocar "Tentar de novo" → busca volta.
 6. Teclado virtual ligado (Simulator: ⌘K), abrir "Filtros", tocar em "Preço até": o teclado numérico aparece, dá para rolar o modal até "Ver N carros" (e arrastar o sheet para baixo fecha o modal).
 7. Log do host-rn sem "Invalid hook call" e sem aviso de versão de shared.
 

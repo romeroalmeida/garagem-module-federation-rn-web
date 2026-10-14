@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import type { Rotas } from '@/app/routes/Navegacao'
+import type { Rotas } from '@/shared/types/rotas'
 
 const preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 })
 const inteiro = new Intl.NumberFormat('pt-BR')
