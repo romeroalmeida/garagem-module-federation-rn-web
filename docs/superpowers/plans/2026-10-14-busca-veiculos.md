@@ -1482,10 +1482,10 @@ const estilos = {
 } satisfies Record<string, CSSProperties>
 ```
 
-- [ ] **Step 10: Typecheck e testes**
+- [ ] **Step 10: Typecheck, testes e build**
 
-Run: `cd host-react && npx tsc --noEmit && npx vitest run`
-Expected: sem erros; 4 testes passando.
+Run: `cd host-react && npx tsc --noEmit && npx vitest run && npx rspack build`
+Expected: sem erros; 4 testes passando; build ok (funciona com o remote fora do ar, porque remote por manifesto é resolvido em tempo de execução). Apagar o `dist/` gerado (está no `.gitignore`).
 
 - [ ] **Step 11: Commit**
 
@@ -1498,26 +1498,27 @@ git commit -m "feat(host-react): host web carregando a busca via Module Federati
 
 - [ ] **Step 1: Subir os dois servidores em background**
 
+```bash
+cd mini-app && nohup npm run dev:web > /tmp/estudo-mf-mini-web.log 2>&1 &
+cd host-react && nohup npm run dev > /tmp/estudo-mf-host-react.log 2>&1 &
+until node -e "fetch('http://localhost:3001/mf-manifest.json').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; do sleep 2; done
+until node -e "fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; do sleep 2; done
 ```
-cd mini-app && npm run dev:web > /tmp/estudo-mf-mini-web.log 2>&1
-cd host-react && npm run dev > /tmp/estudo-mf-host-react.log 2>&1
-```
-Esperar as portas 3001 e 3000 responderem.
 
 - [ ] **Step 2: Roteiro no Chrome** (`mcp__claude-in-chrome__*`; screenshot de cada passo relevante)
 
 1. `http://localhost:3000` → redireciona para `/busca`; cabeçalho "Garagem · host web"; borda tracejada "remote: busca"; 30 carros.
 2. Digitar "civic" → URL vira `/busca?q=civic`, "1 carro encontrado".
-3. Limpar o texto, marcar Honda e Toyota, "Preço até" 120000 → URL com `marcas=Honda,Toyota&precoMax=120000`.
+3. Limpar o texto, marcar Honda e Toyota, "Preço até" 120000 → URL com `marcas=Honda%2CToyota&precoMax=120000` (o `URLSearchParams` codifica a vírgula; `lerFiltros` lê as duas formas).
 4. Clicar num carro → `/veiculo/<id>` com os dados do carro.
 5. "Voltar para a busca" → mesma URL e os mesmos filtros marcados na tela.
 6. Janela estreita (~400px) → botão "Filtros (2)" e modal.
 7. Abrir `http://localhost:3000/veiculo/1` numa aba nova → "Anúncio não encontrado".
 8. Copiar a URL da busca com filtros, abrir numa aba nova → mesmos filtros.
-9. Matar o servidor da 3001 e recarregar `/busca` → "Busca indisponível". Subir a 3001 de novo, clicar "Tentar de novo" → busca volta.
-10. Console sem "Invalid hook call", sem erro de CORS e sem aviso de versão de shared.
+9. **Console até aqui** (passos 1–8): sem "Invalid hook call", sem erro de CORS, sem aviso de versão de shared.
+10. Remote fora do ar: `lsof -ti tcp:3001 | xargs kill`, recarregar `/busca` → "Busca indisponível" (agora o console tem, corretamente, `ERR_CONNECTION_REFUSED` no manifesto e o erro capturado pelo boundary). Subir de novo (`cd mini-app && nohup npm run dev:web > /tmp/estudo-mf-mini-web.log 2>&1 &`), esperar a 3001 responder e clicar "Tentar de novo" → a busca volta.
 
-- [ ] **Step 3: Se algo falhar**, corrigir com @superpowers:systematic-debugging, commitar a correção com mensagem `fix(...)` e repetir o roteiro. Ao final, parar os servidores.
+- [ ] **Step 3: Se algo falhar**, corrigir com @superpowers:systematic-debugging, commitar a correção com mensagem `fix(...)` e repetir o roteiro. Ao final, parar os servidores: `lsof -ti tcp:3000,3001 | xargs kill`.
 
 ---
 
