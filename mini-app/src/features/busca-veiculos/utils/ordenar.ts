@@ -17,7 +17,7 @@ const COMPARADORES: Record<Exclude<Ordem, 'relevancia'>, (a: Veiculo, b: Veiculo
   'mais-novos': (a, b) => b.ano - a.ano,
 }
 
-/** Cópia ordenada (sort estável); relevância = ordem dos dados. */
+/** Relevância devolve a própria lista (ordem dos dados); as outras ordens, uma cópia ordenada (sort estável). */
 export function ordenarVeiculos(veiculos: Veiculo[], ordem: Ordem | undefined): Veiculo[] {
   if (!ordem || ordem === 'relevancia') return veiculos
   return [...veiculos].sort(COMPARADORES[ordem])

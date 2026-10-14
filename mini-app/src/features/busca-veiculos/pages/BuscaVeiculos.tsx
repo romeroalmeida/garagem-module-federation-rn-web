@@ -53,7 +53,14 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
         <BarraBusca valor={filtros.texto} onChange={(texto) => atualizar({ ...filtros, texto })} />
 
         {(!largo || chips.length > 0) && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={estilos.chips}>
+          // ScrollView horizontal cresce e encolhe por padrão: sem flexGrow/flexShrink 0 a fileira vira 7px no celular
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            style={estilos.linhaChips}
+            contentContainerStyle={estilos.chips}
+          >
             {!largo && (
               <Chip icone="SlidersHorizontal" rotulo={ativos > 0 ? `Filtros (${ativos})` : 'Filtros'} onPress={() => setModalAberto(true)} />
             )}
@@ -84,6 +91,7 @@ export default function BuscaVeiculos({ filtrosIniciais, onFiltrosMudaram, onSel
               <Botao rotulo="Limpar busca e filtros" onPress={() => atualizar(FILTROS_VAZIOS)} />
             </View>
           }
+          style={estilos.grade}
           contentContainerStyle={estilos.lista}
         />
       </View>
@@ -116,7 +124,11 @@ const estilos = StyleSheet.create({
   lateral: { width: 280, flexGrow: 0, flexShrink: 0, borderRightWidth: 1, borderRightColor: cores.line },
   lateralConteudo: { padding: 16 },
   conteudo: { flex: 1, padding: 16, gap: 12 },
-  chips: { gap: 8, alignItems: 'center' },
+  // padding + margin negativa: o anel de foco (4px) não é cortado pelo overflow do scroller
+  linhaChips: { flexGrow: 0, flexShrink: 0, margin: -4 },
+  chips: { gap: 8, alignItems: 'center', padding: 4 },
+  // compensa o padding das células: a grade alinha com a busca
+  grade: { marginHorizontal: -6 },
   lista: { paddingBottom: 24 },
   celula: { padding: 6 },
   vazio: { alignItems: 'center', gap: 12, paddingVertical: 40 },

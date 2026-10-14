@@ -6,7 +6,7 @@ import { ROTULO_CAMBIO, ROTULO_COMBUSTIVEL, formatarKm, formatarPreco } from '..
 type Props = { veiculo: Veiculo; onPress: () => void }
 
 export function CardVeiculo({ veiculo, onPress }: Props) {
-  const rotulo = `${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${formatarPreco(veiculo.preco)}`
+  const rotulo = `${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}, ${veiculo.ano}, ${formatarKm(veiculo.km)}, ${ROTULO_CAMBIO[veiculo.cambio]}, ${ROTULO_COMBUSTIVEL[veiculo.combustivel]}, ${veiculo.cidade} (${veiculo.uf}), ${formatarPreco(veiculo.preco)}`
   return (
     <Card onPress={onPress} rotulo={rotulo}>
       <Silhueta carroceria={veiculo.carroceria} />

@@ -1113,6 +1113,8 @@ const estilos = StyleSheet.create({
 })
 ```
 
+> **Revisão (aplicada depois):** o `ScrollView` horizontal dos chips precisa de `style={{ flexGrow: 0, flexShrink: 0, margin: -4 }}` + `padding: 4` no conteúdo e `keyboardShouldPersistTaps="handled"` — por padrão ele cresce/encolhe e a fileira virava 7px no celular (o "Filtros" sumia). Também: grade com `marginHorizontal: -6` e rótulo do card com câmbio, combustível e cidade.
+
 - [ ] **Step 8: Checks**
 
 ```bash
