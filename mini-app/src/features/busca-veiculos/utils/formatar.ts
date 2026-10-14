@@ -12,3 +12,6 @@ export const formatarKm = (n: number) => `${inteiro.format(n)} km`
 export const formatarResultado = (n: number) =>
   n === 1 ? '1 carro encontrado' : `${n} carros encontrados`
 export const formatarVerCarros = (n: number) => (n === 1 ? 'Ver 1 carro' : `Ver ${n} carros`)
+
+export const ROTULO_CAMBIO = { manual: 'Manual', automatico: 'Automático' } as const
+export const ROTULO_COMBUSTIVEL = { flex: 'Flex', diesel: 'Diesel', eletrico: 'Elétrico' } as const

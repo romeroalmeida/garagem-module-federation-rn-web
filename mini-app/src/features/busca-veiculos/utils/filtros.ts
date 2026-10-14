@@ -1,4 +1,6 @@
 import type { Filtros } from '../types'
+import { formatarKm, formatarPreco } from './formatar'
+import { ORDENS } from './ordenar'
 
 export const FILTROS_VAZIOS: Filtros = { texto: '', marcas: [] }
 
@@ -14,6 +16,7 @@ export function normalizarFiltros(filtros: Filtros | undefined, marcasExistentes
     precoMax: limite(filtros.precoMax),
     anoMin: limite(filtros.anoMin),
     kmMax: limite(filtros.kmMax),
+    ordem: filtros.ordem && ORDENS.includes(filtros.ordem) ? filtros.ordem : undefined,
   }
 }
 
@@ -26,4 +29,19 @@ export function contarFiltrosAtivos(f: Filtros): number {
 export function lerNumero(texto: string): number | undefined {
   const digitos = texto.replace(/\D/g, '')
   return digitos === '' ? undefined : Number(digitos)
+}
+
+export type ChipAtivo = { id: string; rotulo: string; sem: Filtros }
+
+/** Um chip por filtro ativo do painel (texto e ordem ficam de fora), cada um com os filtros sem ele. */
+export function chipsAtivos(f: Filtros): ChipAtivo[] {
+  const chips: ChipAtivo[] = f.marcas.map((marca) => ({
+    id: `marca-${marca}`,
+    rotulo: marca,
+    sem: { ...f, marcas: f.marcas.filter((m) => m !== marca) },
+  }))
+  if (f.precoMax !== undefined) chips.push({ id: 'preco', rotulo: `Até ${formatarPreco(f.precoMax)}`, sem: { ...f, precoMax: undefined } })
+  if (f.anoMin !== undefined) chips.push({ id: 'ano', rotulo: `A partir de ${f.anoMin}`, sem: { ...f, anoMin: undefined } })
+  if (f.kmMax !== undefined) chips.push({ id: 'km', rotulo: `Até ${formatarKm(f.kmMax)}`, sem: { ...f, kmMax: undefined } })
+  return chips
 }

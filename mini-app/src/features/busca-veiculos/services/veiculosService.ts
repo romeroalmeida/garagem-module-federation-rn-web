@@ -2,7 +2,7 @@ import type { Veiculo } from '../types'
 import dados from './veiculos.json'
 
 // ponytail: JSON local; quando virar API, só este arquivo muda
-const veiculos: Veiculo[] = dados
+const veiculos = dados as Veiculo[]
 
 export function listarVeiculos(): Veiculo[] {
   return veiculos
