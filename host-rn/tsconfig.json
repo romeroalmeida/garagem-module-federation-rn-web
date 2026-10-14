@@ -1,0 +1,12 @@
+{
+  "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@busca/tipos": ["../mini-app/src/features/busca-veiculos/types"]
+    }
+  },
+  "include": ["src", "index.js"],
+  "exclude": ["node_modules", "ios", "android"]
+}
