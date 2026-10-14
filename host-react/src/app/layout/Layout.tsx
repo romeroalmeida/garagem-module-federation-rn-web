@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { NavLink, Outlet } from 'react-router'
-import { cores, tipo } from '@garagem/ds'
+import { cores, sombras, tipo } from '@garagem/ds'
 
 export function Layout() {
   return (
@@ -22,7 +22,7 @@ export function Layout() {
 }
 
 const estilos = {
-  raiz: { display: 'flex', flexDirection: 'column', height: '100%', background: cores.bg },
+  raiz: { display: 'flex', flexDirection: 'column', height: '100%', background: cores.surface },
   cabecalho: {
     position: 'sticky',
     top: 0,
@@ -32,7 +32,7 @@ const estilos = {
     gap: 24,
     padding: '12px 16px',
     background: cores.bg,
-    borderBottom: `1px solid ${cores.line}`,
+    boxShadow: sombras.card,
   },
   logo: { ...tipo.display, fontSize: 24 },
   // borda transparente reservada: o link ativo não desloca 2px

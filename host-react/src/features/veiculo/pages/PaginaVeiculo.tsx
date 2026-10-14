@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { Link, useLocation, useNavigate } from 'react-router'
-import { Botao, Selo, Silhueta, cores, raios, tipo } from '@garagem/ds'
+import { Botao, FotoCarro, Selo, cores, raios, sombras, tipo } from '@garagem/ds'
 import type { Veiculo } from '@busca/tipos'
 import type { Simulacao } from '@financiamento/tipos'
 import { RemoteFinanciamento } from '../components/RemoteFinanciamento'
@@ -13,6 +13,20 @@ const inteiro = new Intl.NumberFormat('pt-BR')
 const CAMBIO: Record<Veiculo['cambio'], string> = { manual: 'Manual', automatico: 'Automático' }
 const COMBUSTIVEL: Record<Veiculo['combustivel'], string> = { flex: 'Flex', diesel: 'Diesel', eletrico: 'Elétrico' }
 const CARROCERIA: Record<Veiculo['carroceria'], string> = { hatch: 'Hatch', sedan: 'Sedã', suv: 'SUV', picape: 'Picape' }
+const COR: Record<Veiculo['cor'], string> = {
+  prata: 'Prata',
+  preto: 'Preto',
+  branco: 'Branco',
+  cinza: 'Cinza',
+  vermelho: 'Vermelho',
+  azul: 'Azul',
+  verde: 'Verde',
+  amarelo: 'Amarelo',
+  laranja: 'Laranja',
+  marrom: 'Marrom',
+  bege: 'Bege',
+  vinho: 'Vinho',
+}
 const DESKTOP = 1024
 
 function irParaSimulador() {
@@ -44,6 +58,7 @@ export function PaginaVeiculo() {
     ['Câmbio', CAMBIO[veiculo.cambio]],
     ['Combustível', COMBUSTIVEL[veiculo.combustivel]],
     ['Carroceria', CARROCERIA[veiculo.carroceria]],
+    ['Cor', COR[veiculo.cor]],
   ]
 
   const simulador = (
@@ -60,27 +75,49 @@ export function PaginaVeiculo() {
     <div style={desktop ? estilos.grade : estilos.coluna}>
       <div style={estilos.principal}>
         <div style={estilos.foto}>
-          <Silhueta carroceria={veiculo.carroceria} />
+          <FotoCarro
+            fonte={veiculo.foto}
+            carroceria={veiculo.carroceria}
+            credito={veiculo.creditoFoto && { autor: veiculo.creditoFoto.autor, licenca: veiculo.creditoFoto.licenca }}
+            descricao={`${veiculo.marca} ${veiculo.modelo}`}
+          />
         </div>
+        {veiculo.creditoFoto && (
+          <p style={estilos.credito}>
+            Foto:{' '}
+            <a href={veiculo.creditoFoto.fonte} target="_blank" rel="noopener noreferrer" style={estilos.creditoLink}>
+              {veiculo.creditoFoto.autor}
+            </a>{' '}
+            ·{' '}
+            <a href={veiculo.creditoFoto.licencaUrl} target="_blank" rel="noopener noreferrer" style={estilos.creditoLink}>
+              {veiculo.creditoFoto.licenca}
+            </a>{' '}
+            · Wikimedia Commons
+          </p>
+        )}
         <h1 style={estilos.titulo}>
           {veiculo.marca} <span style={{ color: cores.accentInk }}>{veiculo.modelo}</span>
         </h1>
         <p style={estilos.versao}>{veiculo.versao}</p>
-        <dl style={estilos.specs}>
-          {specs.map(([rotulo, valor]) => (
-            <div key={rotulo}>
-              <dt style={estilos.specRotulo}>{rotulo}</dt>
-              <dd style={estilos.specValor}>{valor}</dd>
-            </div>
-          ))}
-        </dl>
+        <div style={estilos.specsCard}>
+          <dl style={estilos.specs}>
+            {specs.map(([rotulo, valor]) => (
+              <div key={rotulo}>
+                <dt style={estilos.specRotulo}>{rotulo}</dt>
+                <dd style={estilos.specValor}>{valor}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
         {!desktop && simulador}
         <Botao variante="contorno" rotulo="Voltar para a busca" onPress={() => navigate(-1)} />
       </div>
 
       {desktop ? (
         <aside style={estilos.lateral}>
-          <p style={estilos.preco}>{preco.format(veiculo.preco)}</p>
+          <div style={estilos.precoCard}>
+            <p style={estilos.preco}>{preco.format(veiculo.preco)}</p>
+          </div>
           {simulador}
         </aside>
       ) : (
@@ -110,15 +147,19 @@ const estilos = {
   },
   principal: { display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 },
   foto: { borderRadius: raios.card, overflow: 'hidden' },
+  credito: { ...tipo.legenda, margin: 0 },
+  creditoLink: { color: cores.accentInk, textDecoration: 'underline' },
   // fontWeight 400: o <h1> aplica bold e a Archivo Black só tem 400 (o navegador faria negrito falso)
   titulo: { ...tipo.display, fontWeight: 400, fontSize: 32, lineHeight: 1.1, margin: 0 },
   versao: { ...tipo.legenda, margin: 0, textTransform: 'uppercase' },
+  specsCard: { background: cores.bg, borderRadius: raios.card, boxShadow: sombras.card, padding: 16 },
   specs: { display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, margin: 0 },
   specRotulo: { ...tipo.legenda },
   specValor: { ...tipo.corpoForte, margin: 0 },
   simulador: { display: 'flex', flexDirection: 'column', gap: 12 },
   // o scroll é do <main> (abaixo do header), então o sticky conta a partir dele
   lateral: { position: 'sticky', top: 16, display: 'flex', flexDirection: 'column', gap: 12 },
+  precoCard: { background: cores.bg, borderRadius: raios.card, boxShadow: sombras.card, padding: 16 },
   preco: { ...tipo.preco, fontSize: 28, margin: 0 },
   barra: {
     position: 'fixed',
@@ -131,7 +172,7 @@ const estilos = {
     gap: 12,
     padding: '12px 16px',
     background: cores.bg,
-    borderTop: `1px solid ${cores.line}`,
+    boxShadow: '0 -4px 16px rgba(23, 23, 23, 0.08)',
     zIndex: 10,
   },
 } satisfies Record<string, CSSProperties>
