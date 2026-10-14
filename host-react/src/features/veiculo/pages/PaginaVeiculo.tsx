@@ -1,13 +1,17 @@
-import type { CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import type { Veiculo } from '@busca/tipos'
+import type { Simulacao } from '@financiamento/tipos'
+import { RemoteFinanciamento } from '../components/RemoteFinanciamento'
 
 const preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 })
 const inteiro = new Intl.NumberFormat('pt-BR')
+const parcela = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 export function PaginaVeiculo() {
   const navigate = useNavigate()
   const veiculo = (useLocation().state as { veiculo?: Veiculo } | null)?.veiculo
+  const [proposta, setProposta] = useState<Simulacao>()
 
   // Sem state = URL aberta numa aba nova (F5 na mesma aba mantém o state)
   if (!veiculo) {
@@ -31,6 +35,12 @@ export function PaginaVeiculo() {
       <p>
         {veiculo.ano} · {inteiro.format(veiculo.km)} km · {veiculo.cidade} - {veiculo.uf}
       </p>
+      <RemoteFinanciamento key={veiculo.id} preco={veiculo.preco} onInteresse={setProposta} />
+      {proposta && (
+        <p style={estilos.proposta} role="status">
+          Proposta enviada ✓ — {proposta.prazo}x de {parcela.format(proposta.parcela)}
+        </p>
+      )}
       <button type="button" onClick={() => navigate(-1)}>
         Voltar para a busca
       </button>
@@ -54,4 +64,5 @@ const estilos = {
   nome: { marginBottom: 0 },
   versao: { fontWeight: 400, color: '#52525b' },
   preco: { fontSize: 28, fontWeight: 700, margin: '8px 0' },
+  proposta: { margin: '8px', fontWeight: 600, color: '#15803d' },
 } satisfies Record<string, CSSProperties>

@@ -13,7 +13,8 @@
     "verbatimModuleSyntax": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@busca/tipos": ["../mini-app/src/features/busca-veiculos/types"]
+      "@busca/tipos": ["../mini-app/src/features/busca-veiculos/types"],
+      "@financiamento/tipos": ["../financiamento/src/features/simulador/types"]
     }
   },
   "include": ["src"]

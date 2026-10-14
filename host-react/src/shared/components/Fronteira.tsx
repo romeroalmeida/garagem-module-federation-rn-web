@@ -1,10 +1,12 @@
 import type { CSSProperties, ReactNode } from 'react'
 
-/** Só visual: mostra no estudo onde termina o host e começa o remote. */
-export function Fronteira({ children }: { children: ReactNode }) {
+type Props = { nome: string; children: ReactNode }
+
+/** Só visual: mostra no estudo onde termina o host e começa cada remote. */
+export function Fronteira({ nome, children }: Props) {
   return (
     <div style={estilos.borda}>
-      <span style={estilos.etiqueta}>remote: busca</span>
+      <span style={estilos.etiqueta}>remote: {nome}</span>
       {children}
     </div>
   )
