@@ -1,0 +1,24 @@
+{
+  "name": "host-react",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "rspack serve",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@module-federation/enhanced": "2.9.2",
+    "@rspack/cli": "1.6.0",
+    "@rspack/core": "1.6.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "~5.9.0",
+    "vitest": "^4.1.0"
+  }
+}
