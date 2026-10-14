@@ -27,11 +27,10 @@ export function TelaVeiculo({ route, navigation }: NativeStackScreenProps<Rotas,
         {veiculo.ano} · {inteiro.format(veiculo.km)} km · {veiculo.cidade} - {veiculo.uf}
       </Text>
       <RemoteFinanciamento key={veiculo.id} preco={veiculo.preco} onInteresse={setProposta} />
-      {proposta && (
-        <Text style={estilos.proposta} role="status">
-          Proposta enviada ✓ — {proposta.prazo}x de {parcela.format(proposta.parcela)}
-        </Text>
-      )}
+      {/* mesmo molde do web; no iOS o role="status" não anuncia (lacuna conhecida) */}
+      <Text style={estilos.proposta} role="status">
+        {proposta && `Proposta enviada ✓ — ${proposta.prazo}x de ${parcela.format(proposta.parcela)}`}
+      </Text>
       <Pressable role="button" style={estilos.botao} onPress={() => navigation.goBack()}>
         <Text style={estilos.botaoTexto}>Voltar para a busca</Text>
       </Pressable>

@@ -36,11 +36,10 @@ export function PaginaVeiculo() {
         {veiculo.ano} · {inteiro.format(veiculo.km)} km · {veiculo.cidade} - {veiculo.uf}
       </p>
       <RemoteFinanciamento key={veiculo.id} preco={veiculo.preco} onInteresse={setProposta} />
-      {proposta && (
-        <p style={estilos.proposta} role="status">
-          Proposta enviada ✓ — {proposta.prazo}x de {parcela.format(proposta.parcela)}
-        </p>
-      )}
+      {/* região viva sempre montada: inserida já com texto, a primeira proposta pode não ser anunciada */}
+      <p style={estilos.proposta} role="status">
+        {proposta && `Proposta enviada ✓ — ${proposta.prazo}x de ${parcela.format(proposta.parcela)}`}
+      </p>
       <button type="button" onClick={() => navigate(-1)}>
         Voltar para a busca
       </button>

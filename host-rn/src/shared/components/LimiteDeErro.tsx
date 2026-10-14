@@ -27,8 +27,9 @@ export class LimiteDeErro extends Component<Props, { erro: boolean }> {
 }
 
 const estilos = StyleSheet.create({
-  // sem flex: 1 — dentro do ScrollView do detalhe colapsaria
-  centro: { alignItems: 'center', gap: 12, padding: 32 },
+  // flexGrow (não flex: 1): centraliza na caixa da busca e, dentro do ScrollView do detalhe,
+  // fica do tamanho do conteúdo em vez de colapsar
+  centro: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 32 },
   titulo: { fontSize: 16, fontWeight: '600' },
   botao: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 16, borderRadius: 8, backgroundColor: '#7c3aed' },
   botaoTexto: { color: '#fff', fontWeight: '700' },
