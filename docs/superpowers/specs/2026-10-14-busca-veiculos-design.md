@@ -52,6 +52,9 @@ estudo-mf/                      3 projetos independentes, cada um com seu node_m
     remote).
   - `requiredVersion`: `react` e `react-dom` na versão exata do React;
     `react-native` na versão exata do RN.
+- **`shareStrategy: 'loaded-first'` nos dois hosts.** O padrão (`version-first`)
+  busca o manifesto de todo remote na inicialização dos shared: com o remote fora
+  do ar o host nem renderiza e o `ErrorBoundary` nunca aparece.
 - **Remote web servido com CORS** (`Access-Control-Allow-Origin: *` no dev server da
   3001), porque o host da 3000 baixa o `mf-manifest.json` com `fetch`.
   `output.publicPath: 'auto'`.
@@ -66,7 +69,15 @@ estudo-mf/                      3 projetos independentes, cada um com seu node_m
 - **Tipos:** cada host tem um alias de TS (`paths`) `@busca/tipos` →
   `../mini-app/src/features/busca-veiculos/types.ts` (arquivo só com tipos, sem
   imports) e um `remotes.d.ts` com `declare module 'busca/BuscaVeiculos'` tipado com
-  `BuscaVeiculosProps`. `import type` some na compilação: zero código compartilhado.
+  `BuscaVeiculosProps` — os `import type` ficam **dentro** do bloco `declare module`
+  (no topo do arquivo viram augmentation e dão TS2664). `verbatimModuleSyntax` nos
+  hosts garante que o alias só aparece em `import type`, que some na compilação:
+  zero código compartilhado.
+- **Build nativo do mini-app** (não tem `ios/` nem `android/`): `react-native.config.js`
+  com os comandos do Re.Pack, `@react-native-community/cli` + `cli-platform-ios`,
+  `babel.config.js` com `@react-native/babel-preset`, entry explícito
+  (`index.native.js`) e configs com nomes distintos (`rspack.web.config.mjs` e
+  `rspack.native.config.mjs`, passados por `--config`).
 - **Bundler:** Rspack nos três (o Re.Pack já é Rspack).
 - **Gerenciador:** npm. CocoaPods com Ruby 3.3.8 (`.ruby-version` em `host-rn/`, ao
   lado do Gemfile).
@@ -79,7 +90,7 @@ mini-app/src/
 │   ├── components/  BarraBusca.tsx · PainelFiltros.tsx · CardVeiculo.tsx
 │   ├── pages/       BuscaVeiculos.tsx
 │   ├── services/    veiculos.json · veiculosService.ts
-│   ├── utils/       filtrarVeiculos.ts · normalizarFiltros.ts · formatar.ts (+ testes)
+│   ├── utils/       filtrarVeiculos.ts · filtros.ts · formatar.ts (+ testes)
 │   ├── types.ts     ← só tipos, sem imports (os hosts leem daqui)
 │   └── index.ts     ← barrel = módulo exposto
 ├── app/App.tsx      ← roda o mini-app sozinho na web (dev isolado)
@@ -102,7 +113,8 @@ host-rn/src/
 ```
 
 Não existem `shared/`, `api/` nem `state/` (YAGNI). Aliases `@/` nos três.
-Estilo: `StyleSheet` do RN no mini-app e no host-rn; CSS Modules no host-react.
+Estilo: `StyleSheet` do RN no mini-app e no host-rn; objetos de estilo inline no
+host-react (simétrico ao `StyleSheet` e dispensa configurar CSS no Rspack).
 
 ## Contrato do mini-app
 
@@ -156,7 +168,8 @@ type BuscaVeiculosProps = {
 **Mini-app:** largura medida com `useWindowDimensions`.
 
 - **≥ 768px:** `PainelFiltros` em coluna lateral + barra de busca e lista à direita.
-- **< 768px:** barra de busca, botão `Filtros (n)` (n = filtros ativos) e lista.
+- **< 768px:** barra de busca, botão `Filtros (n)` (n = filtros ativos do painel;
+  marcas contam como um, o texto não conta) e lista.
   O botão abre um `Modal` com o **mesmo** `PainelFiltros` e um botão
   "Ver N carros" que só fecha o modal.
 - Filtro aplica na hora em qualquer layout.
@@ -164,12 +177,13 @@ type BuscaVeiculosProps = {
   `aria-checked` — funcionam no RN e no react-native-web, onde os props
   `accessibility*` estão depreciados), campos
   "Preço até", "Ano a partir de", "Km até" (`TextInput keyboardType="numeric"`,
-  caracteres não numéricos descartados, vazio = sem limite) e "Limpar filtros".
+  caracteres não numéricos descartados, vazio = sem limite) e "Limpar filtros"
+  (limpa o painel e preserva o texto da busca).
 - Cabeçalho da lista: "N carros encontrados" (singular para 1).
 - `CardVeiculo`: caixa cinza com a inicial da marca no lugar da foto; marca +
   modelo + versão, `ano · km`, preço, `cidade - UF`. Formatação com
   `Intl.NumberFormat('pt-BR')`.
-- Lista vazia: "Nenhum carro com esses filtros" + "Limpar filtros".
+- Lista vazia: "Nenhum carro com esses filtros" + "Limpar busca e filtros" (zera tudo).
 - Lista com `FlatList`; na web a área tem largura máxima de 1100px.
 
 **Hosts (web e app iguais):** marca fictícia **Garagem**.
