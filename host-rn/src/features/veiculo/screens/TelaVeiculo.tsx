@@ -73,7 +73,7 @@ export function TelaVeiculo({ route, navigation }: NativeStackScreenProps<Rotas,
           >
             <Text style={tipo.legenda}>
               Foto: <Text style={estilos.creditoLink}>{veiculo.creditoFoto.autor}</Text> ·{' '}
-              <Text style={estilos.creditoLink}>{veiculo.creditoFoto.licenca}</Text> · Wikimedia Commons
+              <Text style={estilos.creditoLink}>{veiculo.creditoFoto.licenca}</Text> · Wikimedia Commons · adaptada
             </Text>
           </Pressable>
         )}

@@ -47,7 +47,7 @@ export default Repack.defineRspackConfig((env) => {
             version: reactNativePkg.version,
             requiredVersion: reactNativePkg.version,
           },
-          '@garagem/ds': { singleton: true, eager: false, version: dsPkg.version, requiredVersion: '^1.0.0' },
+          '@garagem/ds': { singleton: true, eager: false, version: dsPkg.version, requiredVersion: '^1.1.0' /* FotoCarro, Campo e sombras chegaram na 1.1.0 */ },
           'react-native-svg': {
             singleton: true,
             eager: false,

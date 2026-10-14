@@ -53,7 +53,7 @@ export default Repack.defineRspackConfig((env) => {
           },
           // design system e svg: uma cópia só em tempo de execução (a do host). Lucide fica fora do shared:
           // shared não sofre tree-shaking (725 KiB), e só o DS o importa
-          '@garagem/ds': { singleton: true, eager: true, version: dsPkg.version, requiredVersion: '^1.0.0' },
+          '@garagem/ds': { singleton: true, eager: true, version: dsPkg.version, requiredVersion: '^1.1.0' /* FotoCarro, Campo e sombras chegaram na 1.1.0 */ },
           'react-native-svg': {
             singleton: true,
             eager: true,

@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-14-design-fase1-design.md`
 
+> **Nota histórica:** este plano foi executado com o DS saindo em 1.0.0 → 1.0.1 → 1.0.2 → 1.1.0 → 1.1.1 e `requiredVersion` final `^1.1.0`. Versões de tarball e `^1.0.0` citadas abaixo são as da época; o procedimento atual está no README ("Mudar o design system").
+
 **Regras para quem executa:**
 - Raiz `/Users/romeroalmeida/Romero/estudos/estudo-mf`, branch `feat/design-fase1`. Caminhos relativos à raiz.
 - Versões **exatas** (`npm install -E`). Nunca `--force`/`--legacy-peer-deps`; se o install falhar, parar e reportar.

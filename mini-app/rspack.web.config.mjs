@@ -72,7 +72,7 @@ export default defineConfig({
         'react-dom': { singleton: true, requiredVersion: versaoReact },
         // a chave é 'react-native' (é o que o código importa; o alias não muda a chave), com a versão do RNW
         'react-native': { singleton: true, version: rnwPkg.version, requiredVersion: rnwPkg.version },
-        '@garagem/ds': { singleton: true, requiredVersion: '^1.0.0', version: dsPkg.version },
+        '@garagem/ds': { singleton: true, requiredVersion: '^1.1.0' /* FotoCarro, Campo e sombras chegaram na 1.1.0 */, version: dsPkg.version },
         // svg compartilhado (registro de views uma vez só); lucide NÃO — shared não sofre tree-shaking (725 KiB)
         'react-native-svg': { singleton: true, requiredVersion: pkg.dependencies['react-native-svg'] },
       },

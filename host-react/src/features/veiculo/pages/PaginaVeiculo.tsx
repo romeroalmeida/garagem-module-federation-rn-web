@@ -92,7 +92,7 @@ export function PaginaVeiculo() {
             <a href={veiculo.creditoFoto.licencaUrl} target="_blank" rel="noopener noreferrer" style={estilos.creditoLink}>
               {veiculo.creditoFoto.licenca}
             </a>{' '}
-            · Wikimedia Commons
+            · Wikimedia Commons · adaptada (recorte e redimensionamento)
           </p>
         )}
         <h1 style={estilos.titulo}>

@@ -58,8 +58,8 @@ design-system/
   `node_modules` do loader de TS, então o pacote não pode ser só fonte TS.
 - **peerDependencies:** `react`, `react-native`, `react-native-svg`, `lucide-react-native` (cada
   projeto instala; o pacote não traz cópia).
-- **Distribuição:** `npm run build && npm pack` → `garagem-ds-1.0.0.tgz` (commitado, para um clone novo
-  instalar); cada projeto instala `"@garagem/ds": "file:../design-system/garagem-ds-1.0.0.tgz"`.
+- **Distribuição:** `npm run build && npm pack` → `garagem-ds-<versão>.tgz` (commitado, para um clone novo
+  instalar); cada projeto instala `"@garagem/ds": "file:../design-system/garagem-ds-<versão>.tgz"`.
   **Não** link simbólico: o `design-system/` tem `node_modules` próprio (devDependencies `typescript`,
   `@types/react`, `react`, `react-native`, `react-native-svg`, `lucide-react-native` para compilar), e
   com symlink o pacote resolveria uma **segunda cópia** de React/RN pelo caminho real.
@@ -98,16 +98,16 @@ design-system/
 | `react-dom` | singleton, exata | — |
 | `react-native` | — | singleton, exata; host eager |
 | `react-native` → react-native-web | **singleton com a chave `react-native`** e versão/requiredVersion do RNW (o código importa `react-native`; o alias não muda a chave — a chave `react-native-web` nunca casa) | — |
-| `@garagem/ds` | singleton, `requiredVersion: '^1.0.0'` | idem; host eager, remotes `eager: false` |
+| `@garagem/ds` | singleton, `requiredVersion: '^1.1.0'` | idem; host eager, remotes `eager: false` |
 | `lucide-react-native` | **não compartilhado**: shared não sofre tree-shaking (725 KiB por build); só o DS importa, e o DS já é singleton | idem |
-| `react-native-svg` | singleton, `^` | idem — **módulo nativo, vem do host** |
+| `react-native-svg` | singleton, versão exata (instalada com `-E`) | idem — **módulo nativo, vem do host** |
 
 - **host-react passa a ter `react-native-web`** + alias `react-native$ → react-native-web` + extensões
   `.web.*` antes das comuns (senão o `react-native-svg` resolve a entrada nativa) + `react-native@0.86.3`
   fixo (o npm instalaria o 0.87 como peer, que não tem o `@react-native/assets-registry` que o web do
   svg importa). Compartilhar o RNW acaba com as cópias duplicadas na mesma folha de estilos.
 - `requiredVersion` = versão **instalada** para `react`/`react-dom`/`react-native` (como hoje);
-  `^1.0.0` para o DS (é o ponto de usar semver).
+  `^1.1.0` para o DS (é o ponto de usar semver).
 - Versões: `react-native-svg` 15.15.5 e `lucide-react-native` 1.57.0 (peers `*` e `^15`), com `-E` nos
   4 projetos. O svg é de antes do RN 0.86: o `pod install` + build no Xcode é o primeiro portão.
 
@@ -226,3 +226,10 @@ Contrato não muda. Visual com o DS:
 - **Telas:** fundo da página em `surface` com cards brancos; busca em pílula branca com sombra;
   selo "Elétrico"/"Diesel" sobre a foto do card; anúncio com foto + crédito com link (autor,
   licença, Wikimedia), spec "Cor" e blocos em cards brancos; simulador em card branco com sombra.
+
+### Ajustes depois da revisão final (14/10/2026)
+- `requiredVersion` do DS é **`^1.1.0`**: os projetos usam `FotoCarro`, `Campo` e `sombras` (1.1.0); com `^1.0.0` um host na 1.0.x seria aceito em silêncio e a busca quebraria.
+- **Chip 1.1.1:** branco com borda `line` (o preenchido em `surface` sumia sobre o fundo `surface`). Campo preenchido e busca com sombra: o texto identifica o controle, a borda é decorativa (WCAG 1.4.11 não a exige) — isso substitui a regra "bordas em inkSoft" de cima.
+- Header web com sombra no lugar da borda `line`.
+- Crédito das fotos diz **"adaptada"** (recorte/redimensionamento; a 23 é composição sobre fundo desfocado) — exigência das CC BY / BY-SA.
+- "Fora do escopo" de cima: fotos reais e hover do card **foram feitos** na Fase 1.1.
