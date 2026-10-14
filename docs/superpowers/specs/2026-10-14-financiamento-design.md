@@ -1,7 +1,8 @@
 # Simulador de financiamento — 2º micro-frontend — design
 
 **Data:** 14/10/2026 · **Status:** aprovado no brainstorm · **Base:** `2026-10-14-busca-veiculos-design.md`
-(tudo que não estiver aqui segue a spec da busca: versões, arquitetura feature-based, regras de commit)
+(tudo que não estiver aqui segue a spec da busca — versões, arquitetura feature-based — e as regras de
+execução/commit do plano `docs/superpowers/plans/2026-10-14-busca-veiculos.md`)
 
 ## Objetivo
 
@@ -76,27 +77,33 @@ financiamento/
         ├── index.ts                       barrel = módulo exposto
         ├── utils/parcela.ts (+ teste)     PRAZOS, TAXA_MENSAL, PRAZO_PADRAO, calcularParcela
         ├── utils/entrada.ts (+ teste)     limitesEntrada, entradaValida, lerNumero
-        ├── utils/formatar.ts (+ teste)    formatarMoeda, formatarTaxa
+        ├── utils/formatar.ts (+ teste)    formatarMoeda (centavos), formatarReais (sem centavos), formatarTaxa
         ├── components/SeletorPrazo.tsx
         └── pages/Simulador.tsx
 
 host-react/src/                            (mudanças)
 ├── shared/components/Fronteira.tsx        ← sai de features/busca/components, ganha prop `nome`
-├── features/busca/components/RemoteBusca.tsx      usa a Fronteira de shared
+├── shared/components/LimiteDeErro.tsx     ← extraído do RemoteBusca, prop `mensagem`
+├── features/busca/components/RemoteBusca.tsx      usa Fronteira e LimiteDeErro de shared
 ├── features/veiculo/components/RemoteFinanciamento.tsx   ← novo
 ├── features/veiculo/pages/PaginaVeiculo.tsx       compõe o simulador + "Proposta enviada"
 └── remotes.d.ts                           + declare module 'financiamento/Simulador'
 
 host-rn/src/                               (mudanças, simétricas)
-├── shared/components/Fronteira.tsx        ← sai de features/busca/components, ganha prop `nome`
+├── shared/components/Fronteira.tsx        ← idem + prop `preencher` (flex: 1 só na busca)
+├── shared/components/LimiteDeErro.tsx     ← idem, retry = DevSettings.reload()
 ├── features/busca/components/RemoteBusca.tsx
 ├── features/veiculo/components/RemoteFinanciamento.tsx   ← novo
 ├── features/veiculo/screens/TelaVeiculo.tsx
 └── remotes.d.ts
 ```
 
-`Fronteira` sobe para `shared/` porque agora duas features a usam (regra feature-based do Romero:
-2+ features → `shared/`).
+`Fronteira` e `LimiteDeErro` sobem para `shared/` porque agora duas features os usam (regra
+feature-based do Romero: 2+ features → `shared/`). No host-rn a `Fronteira` ganha `preencher`:
+`flex: 1` dentro do `ScrollView` do detalhe colapsaria para altura zero, então só a busca (que ocupa
+a tela) usa. Pelo mesmo motivo o fallback do `LimiteDeErro` nativo não tem `flex: 1`.
+
+Também muda o `README.md` da raiz: portas, instalação, comandos e testes do `financiamento`.
 
 ## Contrato do remote
 
@@ -154,7 +161,8 @@ Um bloco só, sem modal nem navegação interna:
 └────────────────────────────────────────────┘
 ```
 
-- Preço do carro sem centavos (`R$ 112.900`); parcela **com** centavos (`R$ 2.647,49`).
+- Preço do carro e limites sem centavos (`formatarReais` → `R$ 112.900`); parcela **com**
+  centavos (`formatarMoeda` → `R$ 2.647,49`).
 - Entrada: `TextInput` com `inputMode="numeric"`, `maxLength={9}`, `aria-label="Entrada"`;
   digitar recalcula na hora.
 - Entrada inválida: some a linha da parcela e aparece "Entrada entre R$ 22.580 e R$ 101.610";
@@ -181,6 +189,8 @@ Um bloco só, sem modal nem navegação interna:
   Com `proposta`, o host mostra "Proposta enviada ✓ — {prazo}x de {parcela}" (formatação do
   host). O estado `proposta` é do host e some ao trocar de carro (a página/tela remonta).
   O caso "Anúncio não encontrado" (web sem state) não muda: sem carro, sem simulador.
+  A `key={veiculo.id}` é defensiva: hoje a página/tela já remonta a cada carro; a key garante o
+  estado inicial do simulador se isso mudar.
 - **host-rn `TelaVeiculo`:** o `ScrollView` ganha `keyboardShouldPersistTaps="handled"` e
   `automaticallyAdjustKeyboardInsets` (o campo de entrada não fica atrás do teclado).
 - **Configuração:** remote `financiamento` nos dois `rspack.config.mjs` (mesmo
@@ -193,6 +203,10 @@ Um bloco só, sem modal nem navegação interna:
 - **Nativo:** como na busca, a falha vira erro fatal no `guardedRequire` do Re.Pack — LogBox em
   tela cheia no dev (fechar mostra o fallback), crash no release. Limitação conhecida; resolvida
   no próximo ciclo (resiliência).
+- **Retry no nativo** (`DevSettings.reload()`) reinicia o app na tela de busca: perde a pilha e os
+  filtros. Na web o reload mantém o detalhe (o `state` do roteador fica no `history.state`).
+  E "derrubar só o financiamento deixa o detalhe funcionando" no nativo vale no dev depois de
+  fechar o LogBox — no release o app fecharia (limitação conhecida acima).
 - **Entrada inválida/vazia:** sem parcela, com a mensagem de limites; botão desabilitado.
 
 ## Testes
@@ -201,8 +215,10 @@ Um bloco só, sem modal nem navegação interna:
   - `parcela`: valores de referência (12x, 48x, 60x) e arredondamento em centavos.
   - `entrada`: `limitesEntrada(112900)` = `{ min: 22580, max: 101610 }`; `entradaValida` inclusiva
     nos dois limites, falsa fora e com `undefined`; `lerNumero` (dígitos, vazio).
-  - `formatar`: moeda com centavos e NBSP (`'R$\u00A02.647,49'`), taxa `'1,49% a.m.'`.
-- **Hosts:** sem lógica nova que peça teste unitário (é composição); typecheck e lint.
+  - `formatar`: moeda com centavos e NBSP (`'R$\u00A02.647,49'`), reais sem centavos
+    (`'R$\u00A0112.900'`), taxa `'1,49% a.m.'`.
+- **Hosts:** sem lógica nova que peça teste unitário (é composição). host-react: `vitest` +
+  `tsc`; host-rn: `tsc` + `lint`.
 - **Roteiro web (Chrome):** abrir o Civic → simulador com "48x de R$ 2.647,49"; mudar prazo para
   12 → "12x de R$ 8.275,38"; entrada fora do limite → mensagem e botão desabilitado; "Tenho
   interesse" → "Proposta enviada ✓ — 12x de R$ 8.275,38"; voltar e abrir outro carro → simulador
@@ -210,6 +226,12 @@ Um bloco só, sem modal nem navegação interna:
   simulador indisponível; religar e "Tentar de novo".
 - **Roteiro nativo:** manifesto em `:8083/ios/mf-manifest.json`, bundle do host compilando,
   typecheck; screenshot do que der sem toque. Os toques ficam com o Romero.
+
+## Nota do estudo
+
+O `react-native-web` não é compartilhado: cada remote web traz sua cópia, e as duas escrevem na
+mesma `<style id="react-native-stylesheet">`. Funciona (cada cópia lê a folha que já existe ao
+carregar) — e é um exemplo de dependência que um time de plataforma poderia passar a compartilhar.
 
 ## Portas
 
