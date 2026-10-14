@@ -22,7 +22,7 @@ export function RemoteBusca(props: BuscaVeiculosProps) {
       <LimiteDeErro mensagem="Busca indisponível">
         <Suspense
           fallback={
-            <View style={estilos.carregando}>
+            <View accessible role="progressbar" aria-label="Carregando busca" style={estilos.carregando}>
               {[0, 1, 2].map((i) => (
                 <Skeleton key={i} largura="100%" altura={300} raio={16} />
               ))}

@@ -13,7 +13,7 @@ export function RemoteFinanciamento(props: SimuladorProps) {
       <LimiteDeErro mensagem="Simulador indisponível">
         <Suspense
           fallback={
-            <div style={estilos.carregando} aria-busy="true" aria-label="Carregando simulador">
+            <div style={estilos.carregando} role="progressbar" aria-label="Carregando simulador">
               <Skeleton largura="100%" altura={460} raio={16} />
             </div>
           }

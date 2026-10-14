@@ -35,7 +35,8 @@ const estilos = {
     borderBottom: `1px solid ${cores.line}`,
   },
   logo: { ...tipo.display, fontSize: 24 },
-  link: { ...tipo.corpoForte, color: cores.ink, textDecoration: 'none', paddingBottom: 2 },
+  // borda transparente reservada: o link ativo não desloca 2px
+  link: { ...tipo.corpoForte, color: cores.ink, textDecoration: 'none', paddingBottom: 2, borderBottom: '2px solid transparent' },
   ativo: { borderBottom: `2px solid ${cores.ink}` },
   etiqueta: { ...tipo.legenda, marginLeft: 'auto', padding: '2px 8px', borderRadius: 999, background: cores.surface },
   main: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' },

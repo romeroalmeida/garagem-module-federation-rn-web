@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { Link, useLocation, useNavigate } from 'react-router'
-import { Botao, Selo, Silhueta, cores, tipo } from '@garagem/ds'
+import { Botao, Selo, Silhueta, cores, raios, tipo } from '@garagem/ds'
 import type { Veiculo } from '@busca/tipos'
 import type { Simulacao } from '@financiamento/tipos'
 import { RemoteFinanciamento } from '../components/RemoteFinanciamento'
@@ -109,8 +109,9 @@ const estilos = {
     alignItems: 'start',
   },
   principal: { display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 },
-  foto: { borderRadius: 16, overflow: 'hidden' },
-  titulo: { ...tipo.display, fontSize: 32, lineHeight: 1.1, margin: 0 },
+  foto: { borderRadius: raios.card, overflow: 'hidden' },
+  // fontWeight 400: o <h1> aplica bold e a Archivo Black só tem 400 (o navegador faria negrito falso)
+  titulo: { ...tipo.display, fontWeight: 400, fontSize: 32, lineHeight: 1.1, margin: 0 },
   versao: { ...tipo.legenda, margin: 0, textTransform: 'uppercase' },
   specs: { display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, margin: 0 },
   specRotulo: { ...tipo.legenda },

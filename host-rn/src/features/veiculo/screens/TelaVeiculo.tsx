@@ -43,7 +43,7 @@ export function TelaVeiculo({ route, navigation }: NativeStackScreenProps<Rotas,
         <View style={estilos.foto}>
           <Silhueta carroceria={veiculo.carroceria} />
         </View>
-        <Text style={[tipo.display, estilos.titulo]}>
+        <Text role="heading" style={[tipo.display, estilos.titulo]}>
           {veiculo.marca} <Text style={{ color: cores.accentInk }}>{veiculo.modelo}</Text>
         </Text>
         <Text style={[tipo.legenda, estilos.versao]}>{veiculo.versao}</Text>
@@ -76,7 +76,8 @@ export function TelaVeiculo({ route, navigation }: NativeStackScreenProps<Rotas,
 
 const estilos = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.bg },
-  conteudo: { gap: 16, padding: 16 },
+  // largura máxima: no iPad deitado a silhueta 4:3 em 100% passaria da altura da tela
+  conteudo: { gap: 16, padding: 16, width: '100%', maxWidth: 720, alignSelf: 'center' },
   foto: { borderRadius: raios.card, overflow: 'hidden' },
   titulo: { fontSize: 28, lineHeight: 32 },
   versao: { textTransform: 'uppercase' },

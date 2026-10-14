@@ -21,7 +21,7 @@ export function RemoteBusca(props: BuscaVeiculosProps) {
 
 function CarregandoBusca() {
   return (
-    <div style={estilos.carregando} aria-busy="true" aria-label="Carregando busca">
+    <div style={estilos.carregando} role="progressbar" aria-label="Carregando busca">
       {[0, 1, 2].map((i) => (
         <Skeleton key={i} largura="100%" altura={300} raio={16} />
       ))}
