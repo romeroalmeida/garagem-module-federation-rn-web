@@ -1,5 +1,21 @@
-import type { ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+
+type Fronteiras = { visivel: boolean; alternar: () => void }
+
+const ContextoFronteiras = createContext<Fronteiras>({ visivel: false, alternar: () => {} })
+
+// ponytail: estado só em memória — AsyncStorage não está instalado; reabrir o app volta para escondido
+export function FronteirasProvider({ children }: { children: ReactNode }) {
+  const [visivel, setVisivel] = useState(false)
+  const alternar = useCallback(() => setVisivel((v) => !v), [])
+  const valor = useMemo(() => ({ visivel, alternar }), [visivel, alternar])
+  return <ContextoFronteiras.Provider value={valor}>{children}</ContextoFronteiras.Provider>
+}
+
+export function useFronteiras() {
+  return useContext(ContextoFronteiras)
+}
 
 type Props = {
   nome: string
@@ -8,8 +24,11 @@ type Props = {
   children: ReactNode
 }
 
-/** Só visual: mostra no estudo onde termina o host e começa cada remote. */
+/** Só visual: mostra no estudo onde termina o host e começa cada remote — escondida até ligar o botão MF. */
 export function Fronteira({ nome, preencher = false, children }: Props) {
+  const { visivel } = useFronteiras()
+  // escondida, mantém só o flex: sem ele a busca colapsa
+  if (!visivel) return <View style={preencher ? estilos.preencher : undefined}>{children}</View>
   return (
     <View style={[estilos.borda, preencher && estilos.preencher]}>
       <Text style={estilos.etiqueta}>remote: {nome}</Text>
