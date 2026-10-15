@@ -1,32 +1,25 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { cores, tipo } from '../tokens'
 
+type Props = {
+  /** texto branco para o rodapé escuro; o ponto accent fica igual nos dois fundos */
+  sobreEscuro?: boolean
+}
+
 /**
- * Placa Mercosul estilizada (proporção ~3:1): a faixa azul vira accent, sem brasão nem bandeira.
- * Placa branca de propósito: lê igual sobre o header claro e sobre o rodapé escuro.
+ * Wordmark minimalista: "garagem" em minúsculas + ponto accent.
+ * O ponto é o "." da própria fonte: alinha na linha de base e escala junto, sem desenho à parte.
  */
-export function Logo() {
+export function Logo({ sobreEscuro = false }: Props) {
   return (
-    <View style={estilos.placa}>
-      <View style={estilos.faixa} />
-      <Text style={estilos.texto}>Garagem</Text>
-    </View>
+    <Text style={[estilos.marca, sobreEscuro && estilos.sobreEscuro]}>
+      garagem<Text style={estilos.ponto}>.</Text>
+    </Text>
   )
 }
 
 const estilos = StyleSheet.create({
-  placa: {
-    alignSelf: 'flex-start',
-    height: 34,
-    paddingHorizontal: 10,
-    paddingTop: 6,
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: cores.ink,
-    borderRadius: 4,
-    backgroundColor: cores.bg,
-    overflow: 'hidden',
-  },
-  faixa: { position: 'absolute', top: 0, left: 0, right: 0, height: 6, backgroundColor: cores.accent },
-  texto: { ...tipo.display, fontSize: 16, lineHeight: 20, letterSpacing: 1.5 },
+  marca: { ...tipo.titulo, fontSize: 26, lineHeight: 32, letterSpacing: -0.8 },
+  sobreEscuro: { color: cores.bg },
+  ponto: { color: cores.accent },
 })

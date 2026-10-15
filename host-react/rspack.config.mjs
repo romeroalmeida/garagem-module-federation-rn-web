@@ -78,7 +78,7 @@ export default defineConfig({
         'react-dom': { singleton: true, requiredVersion: versaoReact },
         // a chave é 'react-native' (é o que o código importa; o alias não muda a chave), com a versão do RNW
         'react-native': { singleton: true, version: rnwPkg.version, requiredVersion: rnwPkg.version },
-        '@garagem/ds': { singleton: true, requiredVersion: '^1.2.0' /* o host usa o Logo e os ícones Heart/Menu (1.2.0); os remotes pedem ^1.1.0 */, version: dsPkg.version },
+        '@garagem/ds': { singleton: true, requiredVersion: '^1.3.0' /* o host usa o Logo com sobreEscuro (1.3.0); os remotes pedem ^1.1.0 */, version: dsPkg.version },
         // svg compartilhado (registro de views uma vez só); lucide NÃO — shared não sofre tree-shaking (725 KiB)
         'react-native-svg': { singleton: true, requiredVersion: pkg.dependencies['react-native-svg'] },
       },

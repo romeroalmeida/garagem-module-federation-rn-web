@@ -38,7 +38,7 @@ export function Rodape() {
     <footer className="rodape" style={estilos.rodape}>
       <div style={estilos.interno}>
         <div style={estilos.marca}>
-          <Logo />
+          <Logo sobreEscuro />
           <p style={estilos.slogan}>O jeito fácil de trocar de carro.</p>
         </div>
 
