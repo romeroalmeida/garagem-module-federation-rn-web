@@ -9,8 +9,8 @@ Specs: `docs/superpowers/specs/` (busca, financiamento, design Fase 1).
 | Projeto | O que é | Porta |
 |---|---|---|
 | `mini-app` (web) | remote `busca` + página standalone | 3001 |
-| `mini-app` (nativo) | remote `busca` via Re.Pack | 8082 (a 9000 é do MinIO do meu-tramite) |
-| `financiamento` (web) | remote `financiamento` + página standalone | 3003 (a 3002 é da API do meu-tramite) |
+| `mini-app` (nativo) | remote `busca` via Re.Pack | 8082 |
+| `financiamento` (web) | remote `financiamento` + página standalone | 3003 |
 | `financiamento` (nativo) | remote `financiamento` via Re.Pack | 8083 |
 | `host-react` | host web (Rspack + React Router) | 3000 |
 | `host-rn` | host nativo (RN 0.86 + Re.Pack) | 8081 |
@@ -77,4 +77,11 @@ links, na página do anúncio.
   falha do remote como erro fatal; feche-o.
 - Na web, os filtros vão para a URL; no app, a pilha de telas mantém a busca viva.
 - Para parar um servidor: `lsof -ti tcp:<porta> -sTCP:LISTEN | xargs kill` — o `-sTCP:LISTEN` é obrigatório: sem ele
-  o `kill` derruba também quem está conectado (Chrome, o app no simulador). Nunca na 9000 (Docker) nem na 3002 (meu-tramite).
+  o `kill` derruba também quem está conectado (Chrome, o app no simulador).
+
+## Licença
+
+Código sob a licença MIT (`LICENSE`). Ficam fora dela, cada um com a licença própria:
+- as fotos em `mini-app/src/features/busca-veiculos/services/fotos/` (CC0, CC BY e CC BY-SA, do Wikimedia
+  Commons; autor, licença e link em `creditos.json`);
+- as fontes Archivo Black e Figtree em `host-rn/assets/fonts/` (SIL Open Font License, em `host-rn/assets/licencas/`).
