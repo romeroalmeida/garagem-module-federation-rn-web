@@ -90,7 +90,7 @@ const estilos = {
   // coluna flex: o Logo é uma View (display flex) e, num bloco comum, esticaria na largura toda
   marca: { display: 'flex', flexDirection: 'column', gap: 16 },
   slogan: { ...tipo.corpoForte, fontSize: 18, color: cores.bg, margin: 0 },
-  colunas: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 32 },
+  colunas: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '32px 24px' },
   // accent liberado aqui: sobre o ink ele tem contraste (no fundo claro, não)
   tituloColuna: {
     ...tipo.corpoForte,

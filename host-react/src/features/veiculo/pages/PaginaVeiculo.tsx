@@ -1,9 +1,10 @@
 import { useState, type CSSProperties } from 'react'
 import { useWindowDimensions } from 'react-native'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { Botao, FotoCarro, Selo, cores, raios, sombras, tipo } from '@garagem/ds'
 import type { Veiculo } from '@busca/tipos'
 import type { Simulacao } from '@financiamento/tipos'
+import { LinkCta } from '@/shared/components/LinkCta'
 import { RemoteFinanciamento } from '../components/RemoteFinanciamento'
 
 const preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 })
@@ -46,7 +47,7 @@ export function PaginaVeiculo() {
     return (
       <div style={estilos.vazio}>
         <h1 style={estilos.titulo}>Anúncio não encontrado</h1>
-        <Link to="/busca">Ir para a busca</Link>
+        <LinkCta to="/busca">Ver carros à venda</LinkCta>
       </div>
     )
   }

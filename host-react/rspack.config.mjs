@@ -24,7 +24,7 @@ const HTML = `<!doctype html>
     <style>
       html, body, #root { height: 100%; margin: 0 } #root { display: flex; flex-direction: column } body { font-family: Figtree, system-ui, sans-serif } :focus-visible { outline: 2px solid #171717; outline-offset: 0; box-shadow: 0 0 0 4px #00E0A0 }
       /* style inline não faz :hover: os estados do cabeçalho e do rodapé ficam aqui */
-      .cabecalho a, .rodape a { text-decoration: none }
+      .cabecalho a, .rodape a, a.cta { text-decoration: none }
       /* .marca fora: o sublinhado atravessaria o texto da placa do logo */
       .cabecalho a:not(.cta):not(.marca):hover, .rodape a:hover { text-decoration: underline; text-underline-offset: 4px }
       /* !important: o fundo do CTA vem do style inline, que ganha de qualquer seletor */

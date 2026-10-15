@@ -233,3 +233,15 @@ Contrato não muda. Visual com o DS:
 - Header web com sombra no lugar da borda `line`.
 - Crédito das fotos diz **"adaptada"** (recorte/redimensionamento; a 23 é composição sobre fundo desfocado) — exigência das CC BY / BY-SA.
 - "Fora do escopo" de cima: fotos reais e hover do card **foram feitos** na Fase 1.1.
+
+## Fase 1.2 — header e rodapé de portal (14/10/2026)
+
+Pedido: "ainda não gostei muito, faz um header e um rodapé mais profissional". Direção aprovada:
+
+- **Logo = placa Mercosul estilizada** (`Logo` no DS 1.2.0): placa branca com borda ink, faixa accent no lugar da azul, sem brasão nem bandeira. Mesma placa no header claro, no rodapé escuro e no app.
+- **Header web (72px, branco, linha `line` embaixo):** placa → Comprar · Vender · Financiar · Tabela FIPE → Favoritos · Entrar · **Anunciar grátis** (CTA ink). Mobile: placa + favoritos + menu num `popover` nativo do HTML.
+- **Rodapé web (ink, largura total):** placa + "O jeito fácil de trocar de carro.", colunas Comprar (atalhos de ordenação reais) / Vender e financiar / Garagem, linha "© 2026 Garagem · estudo de micro-frontends · dados fictícios". Sem CNPJ, selos ou redes sociais inventados.
+- **Fronteiras dos remotes escondidas por padrão:** a borda tracejada "remote: …" era a principal cara de protótipo. Volta pelo botão **"Ver micro-frontends"** no rodapé (web, lembrado no localStorage) e pelo botão **MF** no header do app.
+- **Links sem destino real** levam a `/em-breve/:secao`, uma página honesta de "ainda não construída"; nada de link morto.
+- **Detalhes de implementação:** o rodapé fica dentro do `<main>` (que é quem rola); a busca ocupa 100% da altura dele e o rodapé aparece no fim da rolagem. Link para `/busca?ordem=…` estando na busca **remonta** o remote (ele só lê `filtrosIniciais` na montagem) — só em PUSH/POP, nunca no REPLACE dos filtros. No anúncio mobile, `body:has([data-barra-fixa]) .rodape` ganha folga para a barra de preço fixa.
+- `requiredVersion` do DS: hosts `^1.2.0` (usam o Logo), remotes `^1.1.0`.
