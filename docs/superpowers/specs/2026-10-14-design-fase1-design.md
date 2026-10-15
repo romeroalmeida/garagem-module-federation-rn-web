@@ -238,7 +238,7 @@ Contrato não muda. Visual com o DS:
 
 Pedido: "ainda não gostei muito, faz um header e um rodapé mais profissional". Direção aprovada:
 
-- **Logo = placa Mercosul estilizada** (`Logo` no DS 1.2.0): placa branca com borda ink, faixa accent no lugar da azul, sem brasão nem bandeira. Mesma placa no header claro, no rodapé escuro e no app.
+- **Logo:** primeiro uma placa Mercosul estilizada (DS 1.2.0); trocada a pedido por um **wordmark minimalista** "garagem." (DS 1.3.0): Figtree Bold minúsculo, ponto final em accent, `sobreEscuro` para o rodapé. Mesmo componente no web e no app.
 - **Header web (72px, branco, linha `line` embaixo):** placa → Comprar · Vender · Financiar · Tabela FIPE → Favoritos · Entrar · **Anunciar grátis** (CTA ink). Mobile: placa + favoritos + menu num `popover` nativo do HTML.
 - **Rodapé web (ink, largura total):** placa + "O jeito fácil de trocar de carro.", colunas Comprar (atalhos de ordenação reais) / Vender e financiar / Garagem, linha "© 2026 Garagem · estudo de micro-frontends · dados fictícios". Sem CNPJ, selos ou redes sociais inventados.
 - **Fronteiras dos remotes escondidas por padrão:** a borda tracejada "remote: …" era a principal cara de protótipo. Volta pelo botão **"Ver micro-frontends"** no rodapé (web, lembrado no localStorage) e pelo botão **MF** no header do app.
