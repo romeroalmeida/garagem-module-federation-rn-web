@@ -1,43 +1,27 @@
 import type { CSSProperties } from 'react'
-import { NavLink, Outlet } from 'react-router'
-import { cores, sombras, tipo } from '@garagem/ds'
+import { Outlet } from 'react-router'
+import { cores } from '@garagem/ds'
+import { FronteirasProvider } from '@/shared/components/Fronteira'
+import { Cabecalho } from './Cabecalho'
+import { Rodape } from './Rodape'
 
 export function Layout() {
   return (
-    <div style={estilos.raiz}>
-      <header style={estilos.cabecalho}>
-        <span style={estilos.logo}>Garagem</span>
-        <nav aria-label="Principal">
-          <NavLink to="/busca" style={({ isActive }) => ({ ...estilos.link, ...(isActive ? estilos.ativo : {}) })}>
-            Comprar
-          </NavLink>
-        </nav>
-        <span style={estilos.etiqueta}>host web</span>
-      </header>
-      <main style={estilos.main}>
-        <Outlet />
-      </main>
-    </div>
+    <FronteirasProvider>
+      <div style={estilos.raiz}>
+        <Cabecalho />
+        <main style={estilos.main}>
+          <Outlet />
+          {/* dentro do <main>: o rodapé aparece no fim do scroll, não fixo na tela */}
+          <Rodape />
+        </main>
+      </div>
+    </FronteirasProvider>
   )
 }
 
 const estilos = {
   raiz: { display: 'flex', flexDirection: 'column', height: '100%', background: cores.surface },
-  cabecalho: {
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 24,
-    padding: '12px 16px',
-    background: cores.bg,
-    boxShadow: sombras.card,
-  },
-  logo: { ...tipo.display, fontSize: 24 },
-  // borda transparente reservada: o link ativo não desloca 2px
-  link: { ...tipo.corpoForte, color: cores.ink, textDecoration: 'none', paddingBottom: 2, borderBottom: '2px solid transparent' },
-  ativo: { borderBottom: `2px solid ${cores.ink}` },
-  etiqueta: { ...tipo.legenda, marginLeft: 'auto', padding: '2px 8px', borderRadius: 999, background: cores.surface },
+  // o <main> é quem rola (o aside sticky da página do carro conta a partir dele)
   main: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' },
 } satisfies Record<string, CSSProperties>

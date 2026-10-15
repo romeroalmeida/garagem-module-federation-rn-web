@@ -122,7 +122,7 @@ export function PaginaVeiculo() {
         </aside>
       ) : (
         // correção em relação à Webmotors: o preço não some no celular
-        <div style={estilos.barra}>
+        <div data-barra-fixa style={estilos.barra}>
           <span style={estilos.preco}>{preco.format(veiculo.preco)}</span>
           <Botao variante="acao" rotulo="Ver parcelas" onPress={irParaSimulador} />
         </div>
